@@ -6,12 +6,17 @@ import { ThreeDots } from 'react-loader-spinner';
 import { FaTrashAlt, FaDownload } from 'react-icons/fa';
 import Dropzone, { FileRejection } from 'react-dropzone';
 
+const themes = ['Modern', 'Vintage', 'Minimalist', 'Professional'];
+const rooms = ['Living Room', 'Dining Room', 'Bedroom', 'Bathroom', 'Office'];
+
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [outputImage, setOutputImage] = useState<string | null>(null);
   const [base64Image, setBase64Image] = useState<string | null>(null);
+  const [theme, setTheme] = useState<string>('Modern');
+  const [room, setRoom] = useState<string>('Living Room');
 
   const acceptedFileTypes = {
     'image/jpeg': ['.jpeg', '.jpg', '.png'],
@@ -67,7 +72,7 @@ export default function Home() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ image: base64Image }),
+      body: JSON.stringify({ image: base64Image, theme, room }),
     });
 
     const result = await response.json();
@@ -78,8 +83,10 @@ export default function Home() {
       setLoading(false);
       return;
     }
-
-    setOutputImage(result.output);
+    
+    // Out returns an array of two images
+    // Here we show the second image
+    setOutputImage(result.output[1]);
     setLoading(false);
   }
 
@@ -92,8 +99,57 @@ export default function Home() {
       {/* Header section */}
       <section className='text-center mb-10'>
         <h1 className='font-semibold text-transparent text-5xl bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block bg-clip-text'>
-          Remove background
+          Interior Design
         </h1>
+      </section>
+
+      {/* Dropdown section */}
+      <section className='w-full max-w-lg mx-auto mb-12'>
+        {/* Models */}
+        <div className='mb-6'>
+          <label
+            htmlFor='themes'
+            className='block uppercase tracking-wide text-gray-300 text-xs font-bold mb-2'
+          >
+            Model
+          </label>
+          <select
+            name='themes'
+            id='themes'
+            value={theme}
+            onChange={(event) => setTheme(event.target.value)}
+            className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
+          >
+            {themes.map((themeItem, index) => (
+              <option key={index} value={themeItem}>
+                {themeItem}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Room types */}
+        <div className='mb-6'>
+          <label
+            htmlFor='rooms'
+            className='block uppercase tracking-wide text-gray-300 text-xs font-bold mb-2'
+          >
+            Room Type
+          </label>
+          <select
+            name='rooms'
+            id='rooms'
+            value={room}
+            onChange={(event) => setRoom(event.target.value)}
+            className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
+          >
+            {rooms.map((roomItem, index) => (
+              <option key={index} value={roomItem}>
+                {roomItem}
+              </option>
+            ))}
+          </select>
+        </div>
       </section>
 
       {/* Dropzone section */}
@@ -134,7 +190,7 @@ export default function Home() {
                 loading && 'cursor-progress'
               }`}
             >
-              Remove background
+              Design This Room
             </button>
           </div>
         )}
