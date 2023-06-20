@@ -15,6 +15,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <title>Interior Designer AI</title>
+      </head>
       <body className={inter.className}>{children}</body>
     </html>
   )
