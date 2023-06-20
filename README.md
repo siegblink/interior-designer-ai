@@ -1,4 +1,4 @@
-## Background Remover AI
+## Interior Designer AI
 
 ![App screenshot](public/app-screenshot.png)
 
