@@ -1,46 +1,245 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { saveAs } from 'file-saver';
-import { ThreeDots } from 'react-loader-spinner';
-import { FaTrashAlt, FaDownload } from 'react-icons/fa';
-import Dropzone, { FileRejection } from 'react-dropzone';
+import Dropzone from "react-dropzone";
+import { saveAs } from "file-saver";
+import { useState } from "react";
+import { FileRejection } from "react-dropzone";
+import { ThreeDots } from "react-loader-spinner";
+import { FaTrashAlt } from "react-icons/fa";
+import { FaDownload } from "react-icons/fa";
+import { XCircleIcon } from "@heroicons/react/20/solid";
+import { PhotoIcon } from "@heroicons/react/24/outline";
+import { SparklesIcon } from "@heroicons/react/24/outline";
+import { SelectMenu } from "@/app/selectmenu";
+import { ImageAreaProps } from "@/types";
 
-const themes = ['Modern', 'Vintage', 'Minimalist', 'Professional'];
-const rooms = ['Living Room', 'Dining Room', 'Bedroom', 'Bathroom', 'Office'];
+type ErrorNotificationProps = {
+  errorMessage: string;
+};
 
-export default function Home() {
-  const [file, setFile] = useState<File | null>(null);
-  const [error, setError] = useState<string | null>('');
-  const [loading, setLoading] = useState<boolean>(false);
+type ActionPanelProps = {
+  isLoading: boolean;
+  submitImage(): void;
+};
+
+type UploadedImageProps = {
+  image: File;
+  removeImage(): void;
+  file: {
+    name: string;
+    size: string;
+  };
+};
+
+type ImageOutputProps = ImageAreaProps & {
+  loading: boolean;
+  outputImage: string | null;
+  downloadOutputImage(): void;
+};
+
+const themes = ["Modern", "Vintage", "Minimalist", "Professional"];
+const rooms = ["Living Room", "Dining Room", "Bedroom", "Bathroom", "Office"];
+
+const acceptedFileTypes = {
+  "image/jpeg": [".jpeg", ".jpg", ".png"],
+};
+
+const maxFileSize = 5 * 1024 * 1024; // 5MB
+
+function ErrorNotification({ errorMessage }: ErrorNotificationProps) {
+  return (
+    <div className="mx-4 mb-10 rounded-md bg-red-50 p-4 lg:mx-6 xl:mx-8">
+      <div className="flex">
+        <div className="flex-shrink-0">
+          <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
+        </div>
+        <div className="ml-3">
+          <p className="text-sm font-medium text-red-800">{errorMessage}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ActionPanel({ isLoading, submitImage }: ActionPanelProps) {
+  const isDisabled = isLoading;
+
+  return (
+    <section className="mx-4 bg-gray-900 shadow sm:rounded-lg lg:mx-6 xl:mx-8">
+      <div className="px-4 py-5 sm:p-6">
+        <div className="sm:flex sm:items-start sm:justify-between">
+          <div>
+            <h3 className="text-xl font-semibold leading-6 text-gray-300">
+              Upload a photo or image
+            </h3>
+            <div className="mt-2 max-w-xl text-sm text-gray-500">
+              <p>
+                Upload a photo or image of room whose appearance you want to
+                improve.
+              </p>
+            </div>
+          </div>
+          <div className="mt-5 sm:ml-6 sm:mt-0 sm:flex sm:flex-shrink-0 sm:items-center">
+            <button
+              type="button"
+              disabled={isDisabled}
+              onClick={submitImage}
+              className={`${
+                isDisabled
+                  ? "cursor-not-allowed bg-indigo-300 text-gray-300 hover:bg-indigo-300 hover:text-gray-300"
+                  : "bg-indigo-600 text-white"
+              } inline-flex items-center rounded-md px-3.5 py-2.5 text-sm font-semibold shadow-sm transition-all duration-300 hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
+            >
+              Design this room
+              <SparklesIcon className="ml-2 h-4 w-4 text-gray-300" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ImageOutput(props: ImageOutputProps) {
+  return (
+    <section className="relative w-full">
+      <button
+        type="button"
+        className={`${
+          props.loading ? "flex items-center justify-center" : ""
+        } relative block h-full w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+      >
+        {!props.outputImage && props.loading ? (
+          <span className="flex flex-col items-center">
+            <ThreeDots
+              height="50"
+              width="60"
+              color="#eee"
+              ariaLabel="three-dots-loading"
+              visible={props.loading}
+            />
+            <span className="block text-sm font-semibold text-gray-300">
+              Processing the output image
+            </span>
+          </span>
+        ) : null}
+
+        {!props.outputImage && !props.loading ? (
+          <>
+            <props.icon className="mx-auto h-12 w-12 text-gray-400" />
+            <span className="mt-2 block text-sm font-semibold text-gray-300">
+              {props.title}
+            </span>
+          </>
+        ) : null}
+
+        {!props.loading && props.outputImage ? (
+          <img
+            src={props.outputImage}
+            alt="output"
+            className="h-full w-full object-cover"
+          />
+        ) : null}
+      </button>
+
+      {!props.loading && props.outputImage ? (
+        <button
+          onClick={props.downloadOutputImage}
+          className="group absolute right-1 top-1 bg-yellow-500 p-2 text-black"
+        >
+          <FaDownload className="h-4 w-4 duration-300 group-hover:scale-110" />
+        </button>
+      ) : null}
+    </section>
+  );
+}
+
+function UploadedImage({ file, image, removeImage }: UploadedImageProps) {
+  return (
+    <section className="relative w-full">
+      <button className="relative block h-full w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+        <img
+          src={URL.createObjectURL(image)}
+          alt={image.name}
+          className="h-full w-full object-cover"
+        />
+      </button>
+
+      <button
+        className="group absolute right-1 top-1 rounded bg-yellow-500 p-2 text-black"
+        onClick={removeImage}
+      >
+        <FaTrashAlt className="h-4 w-4 duration-300 group-hover:scale-110" />
+      </button>
+
+      <div className="text-md absolute left-0 top-0 bg-opacity-50 p-2 pl-3.5 text-white">
+        {file.name} ({file.size})
+      </div>
+    </section>
+  );
+}
+
+function ImageDropzone(
+  props: ImageAreaProps & {
+    onImageDrop(acceptedFiles: File[], rejectedFiles: FileRejection[]): void;
+  }
+) {
+  return (
+    <Dropzone
+      onDrop={props.onImageDrop}
+      accept={acceptedFileTypes}
+      maxSize={maxFileSize}
+      multiple={false}
+    >
+      {({ getRootProps, getInputProps }) => (
+        <>
+          <input {...getInputProps()} />
+          <button
+            {...getRootProps()}
+            type="button"
+            className="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          >
+            <props.icon className="mx-auto h-12 w-12 text-gray-400" />
+            <span className="mt-2 block text-sm font-semibold text-gray-300">
+              {props.title}
+            </span>
+          </button>
+        </>
+      )}
+    </Dropzone>
+  );
+}
+
+export default function HomePage() {
   const [outputImage, setOutputImage] = useState<string | null>(null);
   const [base64Image, setBase64Image] = useState<string | null>(null);
-  const [theme, setTheme] = useState<string>('Modern');
-  const [room, setRoom] = useState<string>('Living Room');
+  const [theme, setTheme] = useState<string>(themes[0]);
+  const [room, setRoom] = useState<string>(rooms[0]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>("");
+  const [file, setFile] = useState<File | null>(null);
 
-  const acceptedFileTypes = {
-    'image/jpeg': ['.jpeg', '.jpg', '.png'],
-  };
-
-  const maxFileSize = 5 * 1024 * 1024;
-
-  function onDrop(acceptedFiles: File[], rejectedFiles: FileRejection[]) {
+  function onImageDrop(acceptedFiles: File[], rejectedFiles: FileRejection[]) {
     // Check if any of the uploaded files are not valid
     if (rejectedFiles.length > 0) {
-      console.log(rejectedFiles);
-      setError('Please upload a PNG or JPEG image less than 5MB.');
+      console.info(rejectedFiles);
+      setError("Please upload a PNG or JPEG image less than 5MB.");
       return;
     }
 
     removeImage();
 
-    console.log(acceptedFiles);
-    setError('');
+    console.info(acceptedFiles);
+    setError("");
     setFile(acceptedFiles[0]);
 
     // Convert to base64
+    convertImageToBase64(acceptedFiles[0]);
+  }
+
+  function convertImageToBase64(file: File) {
     const reader = new FileReader();
-    reader.readAsDataURL(acceptedFiles[0]);
+    reader.readAsDataURL(file);
     reader.onload = () => {
       const binaryStr = reader.result as string;
       setBase64Image(binaryStr);
@@ -49,14 +248,14 @@ export default function Home() {
 
   function fileSize(size: number) {
     if (size === 0) {
-      return '0 Bytes';
+      return "0 Bytes";
     }
 
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
     const i = Math.floor(Math.log(size) / Math.log(k));
 
-    return parseFloat((size / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((size / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   }
 
   function removeImage() {
@@ -64,13 +263,22 @@ export default function Home() {
     setOutputImage(null);
   }
 
+  function downloadOutputImage() {
+    saveAs(outputImage as string, "output.png");
+  }
+
   async function submitImage() {
+    if (!file) {
+      setError("Please upload an image.");
+      return;
+    }
+
     setLoading(true);
 
-    const response = await fetch('/api/replicate', {
-      method: 'POST',
+    const response = await fetch("/api/replicate", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ image: base64Image, theme, room }),
     });
@@ -83,170 +291,55 @@ export default function Home() {
       setLoading(false);
       return;
     }
-    
-    // Out returns an array of two images
+
+    // Output returns an array of two images
     // Here we show the second image
     setOutputImage(result.output[1]);
     setLoading(false);
   }
 
-  function downloadOutputImage() {
-    saveAs(outputImage as string, 'output.png');
-  }
-
   return (
-    <main className='max-w-3xl mx-auto my-10 px-4'>
-      {/* Header section */}
-      <section className='text-center mb-10'>
-        <h1 className='font-semibold text-transparent text-5xl bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block bg-clip-text'>
-          Interior Design
-        </h1>
+    <main className="flex min-h-screen flex-col py-10 lg:pl-72">
+      {error ? <ErrorNotification errorMessage={error} /> : null}
+      <ActionPanel isLoading={loading} submitImage={submitImage} />
+
+      <section className="mx-4 mt-9 flex w-fit flex-col space-y-8 lg:mx-6 lg:flex-row lg:space-x-8 lg:space-y-0 xl:mx-8">
+        <SelectMenu
+          label="Model"
+          options={themes}
+          selected={theme}
+          onChange={setTheme}
+        />
+        <SelectMenu
+          label="Room type"
+          options={rooms}
+          selected={room}
+          onChange={setRoom}
+        />
       </section>
 
-      {/* Dropdown section */}
-      <section className='w-full max-w-lg mx-auto mb-12'>
-        {/* Models */}
-        <div className='mb-6'>
-          <label
-            htmlFor='themes'
-            className='block uppercase tracking-wide text-gray-300 text-xs font-bold mb-2'
-          >
-            Model
-          </label>
-          <select
-            name='themes'
-            id='themes'
-            value={theme}
-            onChange={(event) => setTheme(event.target.value)}
-            className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
-          >
-            {themes.map((themeItem, index) => (
-              <option key={index} value={themeItem}>
-                {themeItem}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Room types */}
-        <div className='mb-6'>
-          <label
-            htmlFor='rooms'
-            className='block uppercase tracking-wide text-gray-300 text-xs font-bold mb-2'
-          >
-            Room Type
-          </label>
-          <select
-            name='rooms'
-            id='rooms'
-            value={room}
-            onChange={(event) => setRoom(event.target.value)}
-            className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
-          >
-            {rooms.map((roomItem, index) => (
-              <option key={index} value={roomItem}>
-                {roomItem}
-              </option>
-            ))}
-          </select>
-        </div>
-      </section>
-
-      {/* Dropzone section */}
-      <section className='w-full max-w-lg mx-auto mb-12'>
-        {/* Dropzone */}
-        <div className='w-full text-center border-4 border-gray-500 border-dashed rounded-md cursor-pointer mb-2 text-gray-500'>
-          <Dropzone
-            accept={acceptedFileTypes}
-            multiple={false}
-            maxSize={maxFileSize}
-            onDrop={onDrop}
-          >
-            {({ getRootProps, getInputProps }) => (
-              <section>
-                <div className='p-10' {...getRootProps()}>
-                  <input {...getInputProps()} />
-                  <p>Drag 'n' drop some files here, or click to select files</p>
-                </div>
-              </section>
-            )}
-          </Dropzone>
-        </div>
-
-        {/* Error message */}
-        {error && (
-          <div className='flex justify-center'>
-            <p className='text-md text-yellow-500'>{error}</p>
-          </div>
+      <section className="mt-10 grid flex-1 gap-6 px-4 lg:px-6 xl:grid-cols-2 xl:gap-8 xl:px-8">
+        {!file ? (
+          <ImageDropzone
+            title={`Drag 'n drop your image here or click to upload`}
+            onImageDrop={onImageDrop}
+            icon={PhotoIcon}
+          />
+        ) : (
+          <UploadedImage
+            image={file}
+            removeImage={removeImage}
+            file={{ name: file.name, size: fileSize(file.size) }}
+          />
         )}
 
-        {/* Submit button */}
-        {file && (
-          <div className='flex items-center justify-center mt-2'>
-            <button
-              onClick={submitImage}
-              disabled={loading}
-              className={`text-white text-lg bg-gradient-to-r from-purple-500 to-pink-500 hover:bg-gradient-to-l rounded-lg px-4 py-2 text-center mb-2 ${
-                loading && 'cursor-progress'
-              }`}
-            >
-              Design This Room
-            </button>
-          </div>
-        )}
-      </section>
-
-      {/* Images section */}
-      <section className='grid grid-cols-2 gap-4 mt-4'>
-        {file && (
-          <>
-            <div className='relative'>
-              <img
-                src={URL.createObjectURL(file)}
-                alt={file.name}
-                className='object-cover w-full h-full'
-              />
-              <button
-                className='absolute top-0 right-0 p-2 text-black bg-yellow-500'
-                onClick={removeImage}
-              >
-                <FaTrashAlt className='w-4 h-4 hover:scale-125 duration-300' />
-              </button>
-
-              <div className='absolute bottom-0 left-0 right-0 bg-gray-900 bg-opacity-50 text-white text-md p-2'>
-                {file.name} ({fileSize(file.size)})
-              </div>
-            </div>
-
-            <div className='flex items-center justify-center relative'>
-              {loading && (
-                <ThreeDots
-                  height='60'
-                  width='60'
-                  color='#eee'
-                  ariaLabel='three-dots-loading'
-                  visible={loading}
-                />
-              )}
-
-              {outputImage && (
-                <>
-                  <img
-                    src={outputImage}
-                    alt='output'
-                    className='object-cover w-full h-full'
-                  />
-                  <button
-                    onClick={downloadOutputImage}
-                    className='absolute top-0 right-0 p-3 text-black bg-yellow-500'
-                  >
-                    <FaDownload className='w-6 h-6 hover:scale-125 duration-300' />
-                  </button>
-                </>
-              )}
-            </div>
-          </>
-        )}
+        <ImageOutput
+          title={`AI-generated output goes here`}
+          downloadOutputImage={downloadOutputImage}
+          outputImage={outputImage}
+          icon={SparklesIcon}
+          loading={loading}
+        />
       </section>
     </main>
   );
