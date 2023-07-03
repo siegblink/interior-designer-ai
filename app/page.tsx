@@ -69,13 +69,13 @@ function ActionPanel({ isLoading, submitImage }: ActionPanelProps) {
       <div className="px-4 py-5 sm:p-6">
         <div className="sm:flex sm:items-start sm:justify-between">
           <div>
-            <h3 className="text-xl font-semibold leading-6 text-gray-300">
+            <h3 className="text-base font-semibold leading-6 text-gray-300 lg:text-xl">
               Upload a photo or image
             </h3>
             <div className="mt-2 max-w-xl text-sm text-gray-500">
               <p>
                 Upload a photo or image of room whose appearance you want to
-                improve.
+                improve
               </p>
             </div>
           </div>
@@ -88,7 +88,7 @@ function ActionPanel({ isLoading, submitImage }: ActionPanelProps) {
                 isDisabled
                   ? "cursor-not-allowed bg-indigo-300 text-gray-300 hover:bg-indigo-300 hover:text-gray-300"
                   : "bg-indigo-600 text-white"
-              } inline-flex items-center rounded-md px-3.5 py-2.5 text-sm font-semibold shadow-sm transition-all duration-300 hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
+              } inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm transition-all duration-300 hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 lg:px-3.5 lg:py-2.5`}
             >
               Design this room
               <SparklesIcon className="ml-2 h-4 w-4 text-gray-300" />
