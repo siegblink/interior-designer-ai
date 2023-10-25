@@ -102,7 +102,7 @@ function ActionPanel({ isLoading, submitImage }: ActionPanelProps) {
 
 function ImageOutput(props: ImageOutputProps) {
   return (
-    <section className="relative w-full">
+    <section className="relative min-h-[206px] w-full">
       <button
         type="button"
         className={`${
@@ -156,7 +156,7 @@ function ImageOutput(props: ImageOutputProps) {
 
 function UploadedImage({ file, image, removeImage }: UploadedImageProps) {
   return (
-    <section className="relative w-full">
+    <section className="relative min-h-[206px] w-full">
       <button className="relative block h-full w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
         <img
           src={URL.createObjectURL(image)}
@@ -197,7 +197,7 @@ function ImageDropzone(
           <button
             {...getRootProps()}
             type="button"
-            className="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            className="relative block min-h-[206px] w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           >
             <props.icon className="mx-auto h-12 w-12 text-gray-400" />
             <span className="mt-2 block text-sm font-semibold text-gray-300">
