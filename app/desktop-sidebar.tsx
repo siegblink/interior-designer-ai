@@ -1,6 +1,7 @@
 import { usePathname } from "next/navigation";
 import { navigation } from "@/common";
 import { classNames } from "@/utils";
+import Link from "next/link";
 
 export function DesktopSidebar() {
   const pathName = usePathname();
@@ -21,7 +22,7 @@ export function DesktopSidebar() {
               <ul role="list" className="-mx-2 space-y-1">
                 {navigation.map((item) => (
                   <li key={item.name}>
-                    <a
+                    <Link
                       href={item.href}
                       className={classNames(
                         pathName === item.href
@@ -35,7 +36,7 @@ export function DesktopSidebar() {
                         aria-hidden="true"
                       />
                       {item.name}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
