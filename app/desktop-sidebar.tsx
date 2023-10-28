@@ -1,6 +1,6 @@
 import { usePathname } from "next/navigation";
 import { navigation } from "@/common";
-import { classNames } from "@/utils";
+import classNames from "classnames";
 
 export function DesktopSidebar() {
   const pathName = usePathname();

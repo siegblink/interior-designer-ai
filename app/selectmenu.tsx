@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { classNames } from "@/utils";
+import classNames from "classnames";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 
