@@ -44,7 +44,7 @@ export function SelectMenu({
               <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md py-1 text-gray-300 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-800 sm:text-sm">
                 {options.map((option, index) => (
                   <Listbox.Option
-                    key={index}
+                    key={`${option}_${index}`}
                     value={option}
                     className={({ active }) =>
                       classNames(
