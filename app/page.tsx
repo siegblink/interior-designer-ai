@@ -82,8 +82,7 @@ function ActionPanel({ isLoading, submitImage }: ActionPanelProps) {
             </h3>
             <div className="mt-2 max-w-xl text-sm text-gray-500">
               <p>
-                Enhance the ambiance of your space by effortlessly uploading a
-                photo or image of the room you wish to transform.
+                Upload an image of a room and let our AI generate a new design.
               </p>
             </div>
           </div>
