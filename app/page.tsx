@@ -46,6 +46,10 @@ const acceptedFileTypes = {
 
 const maxFileSize = 5 * 1024 * 1024; // 5MB
 
+/**
+ * Display an error notification
+ * @param {ErrorNotificationProps} props The component props
+ */
 function ErrorNotification({ errorMessage }: ErrorNotificationProps) {
   return (
     <div className="mx-4 mb-10 rounded-md bg-red-50 p-4 lg:mx-6 xl:mx-8">
@@ -61,6 +65,10 @@ function ErrorNotification({ errorMessage }: ErrorNotificationProps) {
   );
 }
 
+/**
+ * Display the action panel
+ * @param {ActionPanelProps} props The component props
+ */
 function ActionPanel({ isLoading, submitImage }: ActionPanelProps) {
   const isDisabled = isLoading;
 
@@ -100,6 +108,10 @@ function ActionPanel({ isLoading, submitImage }: ActionPanelProps) {
   );
 }
 
+/**
+ * Display the image output
+ * @param {ImageOutputProps} props The component props
+ */
 function ImageOutput(props: ImageOutputProps) {
   return (
     <section className="relative min-h-[206px] w-full">
@@ -154,6 +166,10 @@ function ImageOutput(props: ImageOutputProps) {
   );
 }
 
+/**
+ * Display the uploaded image
+ * @param {UploadedImageProps} props The component props
+ */
 function UploadedImage({ file, image, removeImage }: UploadedImageProps) {
   return (
     <section className="relative min-h-[206px] w-full">
@@ -179,6 +195,10 @@ function UploadedImage({ file, image, removeImage }: UploadedImageProps) {
   );
 }
 
+/**
+ * Display the image dropzone
+ * @param {ImageAreaProps} props The component props
+ */
 function ImageDropzone(
   props: ImageAreaProps & {
     onImageDrop(acceptedFiles: File[], rejectedFiles: FileRejection[]): void;
@@ -210,6 +230,9 @@ function ImageDropzone(
   );
 }
 
+/**
+ * Display the home page
+ */
 export default function HomePage() {
   const [outputImage, setOutputImage] = useState<string | null>(null);
   const [base64Image, setBase64Image] = useState<string | null>(null);
@@ -219,7 +242,16 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>("");
   const [file, setFile] = useState<File | null>(null);
 
-  function onImageDrop(acceptedFiles: File[], rejectedFiles: FileRejection[]) {
+  /**
+   * Handle the image drop event
+   * @param {Array<File>} acceptedFiles The accepted files
+   * @param {Array<FileRejection>} rejectedFiles The rejected files
+   * @returns void
+   */
+  function onImageDrop(
+    acceptedFiles: File[],
+    rejectedFiles: FileRejection[]
+  ): void {
     // Check if any of the uploaded files are not valid
     if (rejectedFiles.length > 0) {
       console.info(rejectedFiles);
@@ -237,7 +269,12 @@ export default function HomePage() {
     convertImageToBase64(acceptedFiles[0]);
   }
 
-  function convertImageToBase64(file: File) {
+  /**
+   * Convert the image to base64
+   * @param {File} file The file to convert
+   * @returns void
+   */
+  function convertImageToBase64(file: File): void {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => {
@@ -246,7 +283,12 @@ export default function HomePage() {
     };
   }
 
-  function fileSize(size: number) {
+  /**
+   * Convert the file size to a human-readable format
+   * @param {number} size The file size
+   * @returns {string}
+   */
+  function fileSize(size: number): string {
     if (size === 0) {
       return "0 Bytes";
     }
@@ -258,16 +300,28 @@ export default function HomePage() {
     return parseFloat((size / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   }
 
-  function removeImage() {
+  /**
+   * Remove the uploaded image
+   * @returns void
+   */
+  function removeImage(): void {
     setFile(null);
     setOutputImage(null);
   }
 
-  function downloadOutputImage() {
+  /**
+   * Download the output image
+   * @returns void
+   */
+  function downloadOutputImage(): void {
     saveAs(outputImage as string, "output.png");
   }
 
-  async function submitImage() {
+  /**
+   * Submit the image to the server
+   * @returns {Promise<void>}
+   */
+  async function submitImage(): Promise<void> {
     if (!file) {
       setError("Please upload an image.");
       return;
