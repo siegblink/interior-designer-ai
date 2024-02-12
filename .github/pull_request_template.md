@@ -1,4 +1,4 @@
-# Pull Request - Background Remover
+# Pull Request - Interior Designer
 
 ## Scope
 
