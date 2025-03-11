@@ -12,6 +12,9 @@ import { PhotoIcon } from "@heroicons/react/24/outline";
 import { SparklesIcon } from "@heroicons/react/24/outline";
 import { SelectMenu } from "@/app/selectmenu";
 import { ImageAreaProps } from "@/types";
+import { models } from "@/config/models";
+import { ModelParameters } from "./components/ModelParameters";
+import { AIModel, ModelValues } from "../types";
 
 type ErrorNotificationProps = {
   errorMessage: string;
@@ -280,12 +283,15 @@ function ImageDropzone(
  */
 export default function HomePage() {
   const [outputImage, setOutputImage] = useState<string | null>(null);
+  const [maskImage, setMaskImage] = useState<string | null>(null);
   const [base64Image, setBase64Image] = useState<string | null>(null);
   const [theme, setTheme] = useState<string>(themes[0]);
   const [room, setRoom] = useState<string>(rooms[0]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>("");
   const [file, setFile] = useState<File | null>(null);
+  const [selectedModel, setSelectedModel] = useState<AIModel>(models[0]);
+  const [modelValues, setModelValues] = useState<ModelValues>({});
 
   /**
    * Handle the image drop event
@@ -374,12 +380,20 @@ export default function HomePage() {
 
     setLoading(true);
 
+    const requestBody = {
+      modelId: selectedModel.id,
+      image: base64Image,
+      theme,
+      room,
+      parameters: modelValues
+    };
+
     const response = await fetch("/api/replicate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ image: base64Image, theme, room }),
+      body: JSON.stringify(requestBody),
     });
 
     const result = await response.json();
@@ -393,8 +407,16 @@ export default function HomePage() {
 
     // Output returns an array of two images
     // Here we show the second image
+    setMaskImage(result.output[0]);
     setOutputImage(result.output[1]);
     setLoading(false);
+  }
+
+  function handleParameterChange(name: string, value: any) {
+    setModelValues((prev: ModelValues) => ({
+      ...prev,
+      [name]: value,
+    }));
   }
 
   return (
@@ -405,37 +427,72 @@ export default function HomePage() {
       <section className="mx-4 mt-9 flex w-fit flex-col space-y-8 lg:mx-6 lg:flex-row lg:space-x-8 lg:space-y-0 xl:mx-8">
         <SelectMenu
           label="Model"
-          options={themes}
-          selected={theme}
-          onChange={setTheme}
+          options={models.map(m => m.name)}
+          selected={selectedModel.name}
+          onChange={(name) => {
+            const model = models.find(m => m.name === name);
+            if (model) {
+              setSelectedModel(model);
+              setModelValues({}); // Reset values when model changes
+            }
+          }}
         />
-        <SelectMenu
-          label="Room type"
-          options={rooms}
-          selected={room}
-          onChange={setRoom}
-        />
+        {selectedModel.requiresStyle && (
+          <SelectMenu
+            label="Style"
+            options={themes}
+            selected={theme}
+            onChange={setTheme}
+          />
+        )}
+        {selectedModel.requiresRoomType && (
+          <SelectMenu
+            label="Room type"
+            options={rooms}
+            selected={room}
+            onChange={setRoom}
+          />
+        )}
       </section>
 
+      {selectedModel.parameters.length > 0 && (
+        <section className="mx-4 mt-6 lg:mx-6 xl:mx-8">
+          <h3 className="mb-4 text-lg font-medium text-gray-300">Model Parameters</h3>
+          <ModelParameters
+            parameters={selectedModel.parameters}
+            values={modelValues}
+            onChange={handleParameterChange}
+          />
+        </section>
+      )}
+
       <section className="mt-10 grid flex-1 gap-6 px-4 lg:px-6 xl:grid-cols-2 xl:gap-8 xl:px-8">
-        {!file ? (
+        {!file && selectedModel.requiresImage ? (
           <ImageDropzone
             title={`Drag 'n drop your image here or click to upload`}
             onImageDrop={onImageDrop}
             icon={PhotoIcon}
           />
-        ) : (
+        ) : file ? (
           <UploadedImage
             image={file}
             removeImage={removeImage}
             file={{ name: file.name, size: fileSize(file.size) }}
           />
-        )}
+        ) : null}
 
         <ImageOutput
           title={`AI-generated output goes here`}
           downloadOutputImage={downloadOutputImage}
           outputImage={outputImage}
+          icon={SparklesIcon}
+          loading={loading}
+        />
+
+        <ImageOutput
+          title={`AI-generated masked output goes here`}
+          downloadOutputImage={downloadOutputImage}
+          outputImage={maskImage}
           icon={SparklesIcon}
           loading={loading}
         />

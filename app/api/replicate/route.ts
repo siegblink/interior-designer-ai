@@ -4,6 +4,7 @@ import Replicate from 'replicate';
 export async function POST(request: Request) {
   // 1. Get request data (in JSON format) from the client
   const req = await request.json();
+  console.log("🚀 ~ POST ~ req:", req)
 
   const image = req.image;
   const theme = req.theme;
