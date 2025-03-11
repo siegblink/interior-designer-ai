@@ -290,8 +290,9 @@ export default function HomePage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>("");
   const [file, setFile] = useState<File | null>(null);
-  const [selectedModel, setSelectedModel] = useState<AIModel>(models[0]);
+  const [selectedModel, setSelectedModel] = useState<AIModel>(models[1]);
   const [modelValues, setModelValues] = useState<ModelValues>({});
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState<boolean>(false);
 
   /**
    * Handle the image drop event
@@ -405,10 +406,9 @@ export default function HomePage() {
       return;
     }
 
-    // Output returns an array of two images
-    // Here we show the second image
-    setMaskImage(result.output[0]);
-    setOutputImage(result.output[1]);
+    const processedOutput = selectedModel.preprocessOutput(result.output);
+    setOutputImage(processedOutput.output);
+    setMaskImage(processedOutput.mask || null);
     setLoading(false);
   }
 
@@ -434,10 +434,11 @@ export default function HomePage() {
             if (model) {
               setSelectedModel(model);
               setModelValues({}); // Reset values when model changes
+              setShowAdvancedOptions(false); // Hide advanced options when model changes
             }
           }}
         />
-        {selectedModel.requiresStyle && (
+        {selectedModel.requiresStyle && !showAdvancedOptions && (
           <SelectMenu
             label="Style"
             options={themes}
@@ -445,7 +446,7 @@ export default function HomePage() {
             onChange={setTheme}
           />
         )}
-        {selectedModel.requiresRoomType && (
+        {selectedModel.requiresRoomType && !showAdvancedOptions && (
           <SelectMenu
             label="Room type"
             options={rooms}
@@ -455,6 +456,16 @@ export default function HomePage() {
         )}
       </section>
 
+      <div className="mx-4 mt-4 rounded-md bg-yellow-50 p-4 lg:mx-6 xl:mx-8">
+        <div className="flex">
+          <div className="ml-3">
+            <p className="text-sm font-medium text-yellow-800">
+              For best results, please use JPG or JPEG images. Some models may not work well with other formats.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {selectedModel.parameters.length > 0 && (
         <section className="mx-4 mt-6 lg:mx-6 xl:mx-8">
           <h3 className="mb-4 text-lg font-medium text-gray-300">Model Parameters</h3>
@@ -462,6 +473,8 @@ export default function HomePage() {
             parameters={selectedModel.parameters}
             values={modelValues}
             onChange={handleParameterChange}
+            showAdvanced={showAdvancedOptions}
+            onToggleAdvanced={() => setShowAdvancedOptions(!showAdvancedOptions)}
           />
         </section>
       )}
@@ -489,13 +502,15 @@ export default function HomePage() {
           loading={loading}
         />
 
-        <ImageOutput
-          title={`AI-generated masked output goes here`}
-          downloadOutputImage={downloadOutputImage}
-          outputImage={maskImage}
-          icon={SparklesIcon}
-          loading={loading}
-        />
+        {selectedModel.hasMask && (
+          <ImageOutput
+            title={`AI-generated mask output`}
+            downloadOutputImage={() => saveAs(maskImage as string, "mask.png")}
+            outputImage={maskImage}
+            icon={SparklesIcon}
+            loading={loading}
+          />
+        )}
       </section>
     </main>
   );

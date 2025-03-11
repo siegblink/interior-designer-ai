@@ -1,45 +1,56 @@
 import { NextResponse } from 'next/server';
 import Replicate from 'replicate';
+import { models } from '@/config/models';
 
 export async function POST(request: Request) {
   // 1. Get request data (in JSON format) from the client
   const req = await request.json();
-  console.log("🚀 ~ POST ~ req:", req)
+  // console.log("🚀 ~ POST ~ req:", req)
 
-  const image = req.image;
-  const theme = req.theme;
-  const room = req.room;
+  const { modelId, image, theme, room, parameters } = req;
+
+  // Find the selected model
+  const selectedModel = models.find(m => m.id === modelId);
+  if (!selectedModel) {
+    return NextResponse.json(
+      { error: 'Invalid model ID' },
+      { status: 400 }
+    );
+  }
 
   // 2. Initialize the replicate object with our Replicate API token
   const replicate = new Replicate({
     auth: process.env.REPLICATE_API_TOKEN as string,
   });
 
-  // 3. Set the model that we're about to run
-  const model =
-    'jagilley/controlnet-hough:854e8727697a057c525cdb45ab037f64ecca770a1769cc52287c2e56472a247b';
+  // 3. Preprocess the input using the model's preprocess function
+  const input = selectedModel.preprocessInput ? 
+    selectedModel.preprocessInput({ image, theme, room, parameters }) : 
+    { image, theme, room, ...parameters };
 
-  // 4. Set the image which is the image we uploaded from the client
-  const input = {
-    image,
-    prompt: `A ${theme} ${room} Editorial Style Photo, Symmetry, Straight On, Modern Living Room, Large Window, Leather, Glass, Metal, Wood Paneling, Neutral Palette, Ikea, Natural Light, Apartment, Afternoon, Serene, Contemporary, 4k`,
-    a_prompt: `best quality, extremely detailed, photo from Pinterest, interior, cinematic photo, ultra-detailed, ultra-realistic, award-winning`,
-  };
+  // const {modelId, ...input} = rawInput;
+  console.log("🚀 ~ POST ~ input:", input)
+  try {
+    // 4. Run the model with the processed input
+    const output = await replicate.run(selectedModel.url as `${string}/${string}:${string}`, { input });
 
-  // 5. Run the Replicate's model (to remove background) and get the output image
-  const output = await replicate.run(model, { input });
+    // 5. Check if the output is NULL then return error back to the client
+    if (!output) {
+      console.log('No output from model');
+      return NextResponse.json(
+        { error: 'No output from model' },
+        { status: 500 }
+      );
+    }
 
-  // 6. Check if the output is NULL then return error back to the client
-  if (!output) {
-    console.log('Something went wrong');
+    // 6. Return the output back to the client
+    console.log('Output', output);
+    return NextResponse.json({ output }, { status: 201 });
+  } catch (error) {
+    console.error('Error running model:', error);
     return NextResponse.json(
-      { error: 'Something went wrong' },
+      { error: 'Error running model' },
       { status: 500 }
     );
   }
-
-  // 7. Otherwise, we show output in the console (server-side)
-  //  and return the output back to the client
-  console.log('Output', output);
-  return NextResponse.json({ output }, { status: 201 });
 }

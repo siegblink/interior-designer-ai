@@ -8,6 +8,12 @@ export interface ModelParameter {
   max?: number;
   step?: number;
   options?: string[];
+  isAdvanced?: boolean;
+}
+
+export interface ModelOutput {
+  output: string;
+  mask?: string;
 }
 
 export interface AIModel {
@@ -18,6 +24,10 @@ export interface AIModel {
   requiresImage: boolean;
   requiresStyle: boolean;
   requiresRoomType: boolean;
+  url: string;
+  preprocessInput?: (input: any) => any;
+  preprocessOutput: (output: any) => ModelOutput;
+  hasMask: boolean;
 }
 
 export interface ImageAreaProps {

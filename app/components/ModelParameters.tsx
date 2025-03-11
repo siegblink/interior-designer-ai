@@ -4,12 +4,25 @@ interface ModelParametersProps {
   parameters: ModelParameter[];
   values: ModelValues;
   onChange: (name: string, value: any) => void;
+  showAdvanced: boolean;
+  onToggleAdvanced: () => void;
 }
 
-export function ModelParameters({ parameters, values, onChange }: ModelParametersProps) {
+export function ModelParameters({ parameters, values, onChange, showAdvanced, onToggleAdvanced }: ModelParametersProps) {
+  const visibleParameters = parameters.filter(param => !param.isAdvanced || showAdvanced);
+
   return (
     <div className="space-y-4">
-      {parameters.map((param) => (
+      {parameters.some(p => p.isAdvanced) && (
+        <button
+          onClick={onToggleAdvanced}
+          className="mb-4 inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        >
+          {showAdvanced ? "Hide Advanced Options" : "Show Advanced Options"}
+        </button>
+      )}
+
+      {visibleParameters.map((param) => (
         <div key={param.name} className="flex flex-col space-y-2">
           <label className="text-sm font-medium text-gray-300">
             {param.label}
