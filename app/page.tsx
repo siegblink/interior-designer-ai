@@ -6,7 +6,6 @@ import { useState } from "react";
 import { FileRejection } from "react-dropzone";
 import { ThreeDots } from "react-loader-spinner";
 import { FaTrashAlt } from "react-icons/fa";
-import { FaDownload } from "react-icons/fa";
 import { XCircleIcon } from "@heroicons/react/20/solid";
 import { PhotoIcon } from "@heroicons/react/24/outline";
 import { SparklesIcon } from "@heroicons/react/24/outline";
@@ -17,6 +16,7 @@ import { ModelParameters } from "./components/ModelParameters";
 import { AIModel, ModelValues } from "../types";
 import { useHistory } from './context/HistoryContext';
 import { RecentHistory } from './components/RecentHistory';
+import { ImageWithActions } from "./components/ImageWithActions";
 
 type ErrorNotificationProps = {
   errorMessage: string;
@@ -163,6 +163,8 @@ function ActionPanel({ isLoading, submitImage }: ActionPanelProps) {
  * @param {ImageOutputProps} props The component props
  */
 function ImageOutput(props: ImageOutputProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <section className="relative min-h-[206px] w-full">
       <button
@@ -195,23 +197,15 @@ function ImageOutput(props: ImageOutputProps) {
           </>
         ) : null}
 
-        {!props.loading && props.outputImage ? (
-          <img
-            src={props.outputImage}
-            alt="output"
-            className="h-full w-full object-cover"
+        {!props.loading && props.outputImage && (
+          <ImageWithActions
+            imageUrl={props.outputImage}
+            alt="Generated output"
+            filename="output.png"
+            containerClassName="h-full"
           />
-        ) : null}
+        )}
       </button>
-
-      {!props.loading && props.outputImage ? (
-        <button
-          onClick={props.downloadOutputImage}
-          className="group absolute right-1 top-1 bg-yellow-500 p-2 text-black"
-        >
-          <FaDownload className="h-4 w-4 duration-300 group-hover:scale-110" />
-        </button>
-      ) : null}
     </section>
   );
 }
@@ -508,7 +502,7 @@ export default function HomePage() {
           )}
 
           {!showAdvancedOptions && (
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div className="mt-6 flex flex-row gap-2 sm:grid-cols-2">
               {selectedModel.requiresStyle && (
                 <SelectMenu
                   label="Style"

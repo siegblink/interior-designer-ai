@@ -1,6 +1,5 @@
-import { saveAs } from "file-saver";
-import { FaDownload } from "react-icons/fa";
 import { useEffect, useState } from "react";
+import { ImageWithActions } from "./ImageWithActions";
 
 export interface HistoryItem {
   id: string;
@@ -40,10 +39,6 @@ export function History({ items }: HistoryProps) {
     setGroupedItems(grouped);
   }, [items]);
 
-  const downloadImage = (imageUrl: string, filename: string) => {
-    saveAs(imageUrl, filename);
-  };
-
   return (
     <div className="space-y-8">
       <div className="rounded-md bg-yellow-50 p-4">
@@ -69,32 +64,23 @@ export function History({ items }: HistoryProps) {
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="relative">
-                    <img
-                      src={item.inputImage}
-                      alt="Input"
-                      className="h-40 w-full rounded object-cover"
-                    />
-                    <button
-                      onClick={() => downloadImage(item.inputImage, `input-${item.id}.png`)}
-                      className="group absolute right-1 top-1 rounded bg-yellow-500 p-2 text-black"
-                    >
-                      <FaDownload className="h-4 w-4 duration-300 group-hover:scale-110" />
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <img
-                      src={item.outputImage}
-                      alt="Output"
-                      className="h-40 w-full rounded object-cover"
-                    />
-                    <button
-                      onClick={() => downloadImage(item.outputImage, `output-${item.id}.png`)}
-                      className="group absolute right-1 top-1 rounded bg-yellow-500 p-2 text-black"
-                    >
-                      <FaDownload className="h-4 w-4 duration-300 group-hover:scale-110" />
-                    </button>
-                  </div>
+                  <ImageWithActions
+                    imageUrl={item.inputImage}
+                    alt="Input image"
+                    filename={`input-${item.id}.png`}
+                    containerClassName="relative"
+                    imageClassName="h-40 w-full rounded object-cover"
+                  />
+                  <ImageWithActions
+                    imageUrl={item.outputImage}
+                    alt="Output image"
+                    filename={`output-${item.id}.png`}
+                    containerClassName="relative"
+                    imageClassName="h-40 w-full rounded object-cover"
+                  />
+                </div>
+                <div className="mt-2 text-sm text-gray-400">
+                  {item.roomType}
                 </div>
               </div>
             ))}

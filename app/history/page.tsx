@@ -6,7 +6,7 @@ import { useHistory } from "../context/HistoryContext";
 import { ConfirmationModal } from "../components/ConfirmationModal";
 
 export default function HistoryPage() {
-  const { historyItems, clearHistory } = useHistory();
+  const { historyItems, clearHistory, storageError } = useHistory();
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   return (
@@ -22,6 +22,19 @@ export default function HistoryPage() {
           </button>
         )}
       </div>
+
+      {storageError && (
+        <div className="mx-4 mt-4 rounded-md bg-yellow-50 p-4 lg:mx-6 xl:mx-8">
+          <div className="flex">
+            <div className="ml-3">
+              <p className="text-sm font-medium text-yellow-800">
+                {storageError}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mt-8 px-4 lg:px-6 xl:px-8">
         <History items={historyItems} />
       </div>

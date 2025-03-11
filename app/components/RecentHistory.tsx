@@ -1,18 +1,15 @@
-import { saveAs } from "file-saver";
-import { FaDownload } from "react-icons/fa";
 import Link from "next/link";
 import { HistoryItem } from "./History";
+import { useHistory } from "../context/HistoryContext";
+import { ImageWithActions } from "./ImageWithActions";
 
 interface RecentHistoryProps {
   items: HistoryItem[];
 }
 
 export function RecentHistory({ items }: RecentHistoryProps) {
+  const { storageError } = useHistory();
   const recentItems = items.slice(0, 3);
-
-  const downloadImage = (imageUrl: string, filename: string) => {
-    saveAs(imageUrl, filename);
-  };
 
   if (recentItems.length === 0) {
     return null;
@@ -30,6 +27,18 @@ export function RecentHistory({ items }: RecentHistoryProps) {
         </Link>
       </div>
 
+      {storageError && (
+        <div className="rounded-md bg-yellow-50 p-4">
+          <div className="flex">
+            <div className="ml-3">
+              <p className="text-sm font-medium text-yellow-800">
+                {storageError}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {recentItems.map((item) => (
           <div key={item.id} className="relative space-y-2 rounded-lg border border-gray-700 p-4">
@@ -39,33 +48,22 @@ export function RecentHistory({ items }: RecentHistoryProps) {
                 {new Date(item.timestamp).toLocaleDateString()}
               </span>
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="relative">
-                <img
-                  src={item.inputImage}
-                  alt="Input"
-                  className="h-40 w-full rounded object-cover"
-                />
-                <button
-                  onClick={() => downloadImage(item.inputImage, `input-${item.id}.png`)}
-                  className="group absolute right-1 top-1 rounded bg-yellow-500 p-2 text-black"
-                >
-                  <FaDownload className="h-4 w-4 duration-300 group-hover:scale-110" />
-                </button>
-              </div>
-              <div className="relative">
-                <img
-                  src={item.outputImage}
-                  alt="Output"
-                  className="h-40 w-full rounded object-cover"
-                />
-                <button
-                  onClick={() => downloadImage(item.outputImage, `output-${item.id}.png`)}
-                  className="group absolute right-1 top-1 rounded bg-yellow-500 p-2 text-black"
-                >
-                  <FaDownload className="h-4 w-4 duration-300 group-hover:scale-110" />
-                </button>
-              </div>
+            
+            <div className="space-y-2">
+              <ImageWithActions
+                imageUrl={item.inputImage}
+                alt="Input image"
+                filename={`input-${item.id}.png`}
+                containerClassName="relative"
+                imageClassName="h-40 w-full rounded object-cover"
+              />
+              <ImageWithActions
+                imageUrl={item.outputImage}
+                alt="Output image"
+                filename={`output-${item.id}.png`}
+                containerClassName="relative"
+                imageClassName="h-40 w-full rounded object-cover"
+              />
             </div>
             <div className="mt-2 text-sm text-gray-400">
               {item.roomType}
