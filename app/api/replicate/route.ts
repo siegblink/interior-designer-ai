@@ -28,8 +28,6 @@ export async function POST(request: Request) {
     selectedModel.preprocessInput({ image, theme, room, parameters }) : 
     { image, theme, room, ...parameters };
 
-  // const {modelId, ...input} = rawInput;
-  console.log("🚀 ~ POST ~ input:", input)
   try {
     // 4. Run the model with the processed input
     const output = await replicate.run(selectedModel.url as `${string}/${string}:${string}`, { input });
@@ -44,7 +42,6 @@ export async function POST(request: Request) {
     }
 
     // 6. Return the output back to the client
-    console.log('Output', output);
     return NextResponse.json({ output }, { status: 201 });
   } catch (error) {
     console.error('Error running model:', error);

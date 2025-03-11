@@ -15,6 +15,8 @@ import { ImageAreaProps } from "@/types";
 import { models } from "@/config/models";
 import { ModelParameters } from "./components/ModelParameters";
 import { AIModel, ModelValues } from "../types";
+import { useHistory } from './context/HistoryContext';
+import { RecentHistory } from './components/RecentHistory';
 
 type ErrorNotificationProps = {
   errorMessage: string;
@@ -293,6 +295,7 @@ export default function HomePage() {
   const [selectedModel, setSelectedModel] = useState<AIModel>(models[1]);
   const [modelValues, setModelValues] = useState<ModelValues>({});
   const [showAdvancedOptions, setShowAdvancedOptions] = useState<boolean>(false);
+  const { historyItems, addHistoryItem } = useHistory();
 
   /**
    * Handle the image drop event
@@ -406,10 +409,22 @@ export default function HomePage() {
       return;
     }
 
-    const processedOutput = selectedModel.preprocessOutput(result.output);
+    console.log("🚀 ~ result:", result)
+    const processedOutput = selectedModel.preprocessOutput(result);
     setOutputImage(processedOutput.output);
     setMaskImage(processedOutput.mask || null);
     setLoading(false);
+
+    console.log("🚀 ~ submitImage ~ processedOutput:", processedOutput)
+    // Add to history
+    if (base64Image && processedOutput.output) {
+      addHistoryItem({
+        inputImage: base64Image,
+        outputImage: processedOutput.output,
+        roomType: room,
+        theme,
+      });
+    }
   }
 
   function handleParameterChange(name: string, value: any) {
@@ -422,95 +437,141 @@ export default function HomePage() {
   return (
     <main className="flex min-h-screen flex-col py-10 lg:pl-72">
       {error ? <ErrorNotification errorMessage={error} /> : null}
-      <ActionPanel isLoading={loading} submitImage={submitImage} />
 
-      <section className="mx-4 mt-9 flex w-fit flex-col space-y-8 lg:mx-6 lg:flex-row lg:space-x-8 lg:space-y-0 xl:mx-8">
-        <SelectMenu
-          label="Model"
-          options={models.map(m => m.name)}
-          selected={selectedModel.name}
-          onChange={(name) => {
-            const model = models.find(m => m.name === name);
-            if (model) {
-              setSelectedModel(model);
-              setModelValues({}); // Reset values when model changes
-              setShowAdvancedOptions(false); // Hide advanced options when model changes
-            }
-          }}
-        />
-        {selectedModel.requiresStyle && !showAdvancedOptions && (
-          <SelectMenu
-            label="Style"
-            options={themes}
-            selected={theme}
-            onChange={setTheme}
-          />
-        )}
-        {selectedModel.requiresRoomType && !showAdvancedOptions && (
-          <SelectMenu
-            label="Room type"
-            options={rooms}
-            selected={room}
-            onChange={setRoom}
-          />
-        )}
-      </section>
-
-      <div className="mx-4 mt-4 rounded-md bg-yellow-50 p-4 lg:mx-6 xl:mx-8">
-        <div className="flex">
-          <div className="ml-3">
-            <p className="text-sm font-medium text-yellow-800">
-              For best results, please use JPG or JPEG images. Some models may not work well with other formats.
+      <section className="mx-4 lg:mx-6 xl:mx-8">
+        <div className="mb-6">
+          <h3 className="text-base font-semibold leading-6 text-gray-300 lg:text-xl">
+            Upload a photo or image
+          </h3>
+          <div className="mt-2 max-w-xl text-sm text-gray-500">
+            <p>
+              Upload an image of a room and let our AI generate a new design.
             </p>
           </div>
         </div>
-      </div>
 
-      {selectedModel.parameters.length > 0 && (
-        <section className="mx-4 mt-6 lg:mx-6 xl:mx-8">
-          <h3 className="mb-4 text-lg font-medium text-gray-300">Model Parameters</h3>
-          <ModelParameters
-            parameters={selectedModel.parameters}
-            values={modelValues}
-            onChange={handleParameterChange}
-            showAdvanced={showAdvancedOptions}
-            onToggleAdvanced={() => setShowAdvancedOptions(!showAdvancedOptions)}
-          />
+        <div className="mt-4 rounded-md bg-yellow-50 p-4">
+          <div className="flex">
+            <div className="ml-3">
+              <p className="text-sm font-medium text-yellow-800">
+                For best results, please use JPG or JPEG images. Some models may not work well with other formats.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          {!file && selectedModel.requiresImage ? (
+            <ImageDropzone
+              title={`Drag 'n drop your image here or click to upload`}
+              onImageDrop={onImageDrop}
+              icon={PhotoIcon}
+            />
+          ) : file ? (
+            <UploadedImage
+              image={file}
+              removeImage={removeImage}
+              file={{ name: file.name, size: fileSize(file.size) }}
+            />
+          ) : null}
+        </div>
+      </section>
+
+      {/* {file && ( */}
+        <section className="mx-4 mt-9 space-y-4 lg:mx-6 xl:mx-8">
+          <div className="w-full">
+            <SelectMenu
+              label="Model"
+              options={models.map(m => m.name)}
+              selected={selectedModel.name}
+              onChange={(name) => {
+                const model = models.find(m => m.name === name);
+                if (model) {
+                  setSelectedModel(model);
+                  setModelValues({}); // Reset values when model changes
+                  setShowAdvancedOptions(false); // Hide advanced options when model changes
+                }
+              }}
+            />
+          </div>
+
+          {selectedModel.parameters.length > 0 && (
+            <div className="mt-6">
+              <ModelParameters
+                parameters={selectedModel.parameters}
+                values={modelValues}
+                onChange={handleParameterChange}
+                showAdvanced={showAdvancedOptions}
+                onToggleAdvanced={() => setShowAdvancedOptions(!showAdvancedOptions)}
+              />
+            </div>
+          )}
+
+          {!showAdvancedOptions && (
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              {selectedModel.requiresStyle && (
+                <SelectMenu
+                  label="Style"
+                  options={themes}
+                  selected={theme}
+                  onChange={setTheme}
+                />
+              )}
+              {selectedModel.requiresRoomType && (
+                <SelectMenu
+                  label="Room type"
+                  options={rooms}
+                  selected={room}
+                  onChange={setRoom}
+                />
+              )}
+            </div>
+          )}
+
+          <div className="mt-10 flex justify-start">
+            <button
+              type="button"
+              disabled={loading}
+              onClick={submitImage}
+              className={`${
+                loading
+                  ? "cursor-not-allowed bg-indigo-300 text-gray-300 hover:bg-indigo-300 hover:text-gray-300"
+                  : "bg-indigo-600 text-white hover:bg-indigo-500"
+              } inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 lg:px-3.5 lg:py-2.5`}
+            >
+              Design this room
+              <SparklesIcon className="ml-2 h-4 w-4 text-gray-300" />
+            </button>
+          </div>
         </section>
-      )}
+      {/* )} */}
 
-      <section className="mt-10 grid flex-1 gap-6 px-4 lg:px-6 xl:grid-cols-2 xl:gap-8 xl:px-8">
-        {!file && selectedModel.requiresImage ? (
-          <ImageDropzone
-            title={`Drag 'n drop your image here or click to upload`}
-            onImageDrop={onImageDrop}
-            icon={PhotoIcon}
-          />
-        ) : file ? (
-          <UploadedImage
-            image={file}
-            removeImage={removeImage}
-            file={{ name: file.name, size: fileSize(file.size) }}
-          />
-        ) : null}
-
-        <ImageOutput
-          title={`AI-generated output goes here`}
-          downloadOutputImage={downloadOutputImage}
-          outputImage={outputImage}
-          icon={SparklesIcon}
-          loading={loading}
-        />
-
-        {selectedModel.hasMask && (
+      <section className="mt-10 px-4 lg:px-6 xl:px-8">
+        {(loading || outputImage) && (
           <ImageOutput
-            title={`AI-generated mask output`}
-            downloadOutputImage={() => saveAs(maskImage as string, "mask.png")}
-            outputImage={maskImage}
+            title={`AI-generated output goes here`}
+            downloadOutputImage={downloadOutputImage}
+            outputImage={outputImage}
             icon={SparklesIcon}
             loading={loading}
           />
         )}
+
+        {selectedModel.hasMask && outputImage && (
+          <div className="mt-6">
+            <ImageOutput
+              title={`AI-generated mask output`}
+              downloadOutputImage={() => saveAs(maskImage as string, "mask.png")}
+              outputImage={maskImage}
+              icon={SparklesIcon}
+              loading={loading}
+            />
+          </div>
+        )}
+      </section>
+
+      <section className="mt-10 px-4 lg:px-6 xl:px-8">
+        <RecentHistory items={historyItems} />
       </section>
     </main>
   );

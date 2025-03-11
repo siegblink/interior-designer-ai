@@ -2,6 +2,7 @@ import './globals.css';
 import { Analytics } from '@vercel/analytics/react';
 import { Inter } from 'next/font/google';
 import { Sidebar } from './sidebar';
+import { HistoryProvider } from './context/HistoryContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -26,17 +27,19 @@ export const metadata = {
   },
 };
 
-type RootLayoutProps = {
+export default function RootLayout({
+  children,
+}: {
   children: React.ReactNode;
-};
-
-export default function RootLayout({ children }: RootLayoutProps) {
+}) {
   return (
-    <html lang='en'>
-      <body className={inter.className}>
-        <Sidebar />
-        {children}
-        <Analytics />
+    <html lang="en" className="h-full bg-gray-900">
+      <body className={`${inter.className} h-full`}>
+        <HistoryProvider>
+          <Sidebar />
+          {children}
+          <Analytics />
+        </HistoryProvider>
       </body>
     </html>
   );

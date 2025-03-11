@@ -1,19 +1,19 @@
 import { usePathname } from "next/navigation";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 
-type HeaderProps = {
-  onClick(): void;
-};
+interface HeaderProps {
+  onClick: () => void;
+}
 
 export function Header({ onClick }: HeaderProps) {
   const pathName = usePathname();
   console.log(pathName);
 
   return (
-    <header className="sticky top-0 z-40 flex items-center gap-x-6 bg-gray-900 px-4 py-4 shadow-sm sm:px-6 lg:hidden">
+    <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:hidden lg:px-8">
       <button
         type="button"
-        className="-m-2.5 p-2.5 text-gray-400 lg:hidden"
+        className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
         onClick={onClick}
       >
         <span className="sr-only">Open sidebar</span>
@@ -22,6 +22,6 @@ export function Header({ onClick }: HeaderProps) {
       <div className="flex-1 text-sm font-semibold leading-6 text-white">
         {pathName === "/" ? "Home" : "History"}
       </div>
-    </header>
+    </div>
   );
 }

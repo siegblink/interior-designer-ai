@@ -22,6 +22,10 @@ export function ModelParameters({ parameters, values, onChange, showAdvanced, on
         </button>
       )}
 
+      {
+        showAdvanced && <h3 className="mb-4 text-lg font-medium text-gray-300">Model Parameters</h3>
+      }
+
       {visibleParameters.map((param) => (
         <div key={param.name} className="flex flex-col space-y-2">
           <label className="text-sm font-medium text-gray-300">
@@ -36,7 +40,7 @@ export function ModelParameters({ parameters, values, onChange, showAdvanced, on
               type="text"
               value={values[param.name] ?? param.default ?? ""}
               onChange={(e) => onChange(param.name, e.target.value)}
-              className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
+              className="block w-full rounded-md border-0 bg-white/5 px-1.5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
             />
           )}
 

@@ -1,26 +1,24 @@
 import { Fragment } from "react";
-import { usePathname } from "next/navigation";
+import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { Transition } from "@headlessui/react";
-import { Dialog } from "@headlessui/react";
-import { navigation } from "@/common";
-import { classNames } from "@/utils";
+import Link from "next/link";
 
-type SidebarProps = {
+interface NavigationItem {
+  name: string;
+  href: string;
+  icon: string;
+}
+
+interface MobileSidebarProps {
   sidebarOpen: boolean;
-  setSidebarOpen(open: boolean): void;
-};
+  setSidebarOpen: (open: boolean) => void;
+  navigation: NavigationItem[];
+}
 
-export function MobileSidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
-  const pathName = usePathname();
-
+export function MobileSidebar({ sidebarOpen, setSidebarOpen, navigation }: MobileSidebarProps) {
   return (
     <Transition.Root show={sidebarOpen} as={Fragment}>
-      <Dialog
-        as="div"
-        className="relative z-50 lg:hidden"
-        onClose={setSidebarOpen}
-      >
+      <Dialog as="div" className="relative z-50 lg:hidden" onClose={setSidebarOpen}>
         <Transition.Child
           as={Fragment}
           enter="transition-opacity ease-linear duration-300"
@@ -60,20 +58,13 @@ export function MobileSidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                     onClick={() => setSidebarOpen(false)}
                   >
                     <span className="sr-only">Close sidebar</span>
-                    <XMarkIcon
-                      className="h-6 w-6 text-white"
-                      aria-hidden="true"
-                    />
+                    <XMarkIcon className="h-6 w-6 text-white" aria-hidden="true" />
                   </button>
                 </div>
               </Transition.Child>
-
-              {/* Sidebar component, swap this element with another sidebar if you like */}
-              <aside className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-2 ring-1 ring-white/10">
+              <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4 ring-1 ring-white/10">
                 <div className="flex h-16 shrink-0 items-center">
-                  <h1 className="bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 bg-clip-text text-xl font-semibold text-transparent">
-                    Interior Designer
-                  </h1>
+                  <h1 className="text-2xl font-bold text-white">Interior Designer AI</h1>
                 </div>
                 <nav className="flex flex-1 flex-col">
                   <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -81,28 +72,21 @@ export function MobileSidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                       <ul role="list" className="-mx-2 space-y-1">
                         {navigation.map((item) => (
                           <li key={item.name}>
-                            <a
+                            <Link
                               href={item.href}
-                              className={classNames(
-                                pathName === item.href
-                                  ? "bg-gray-800 text-white"
-                                  : "text-gray-400 hover:bg-gray-800 hover:text-white",
-                                "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 transition-all duration-300"
-                              )}
+                              className="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white"
+                              onClick={() => setSidebarOpen(false)}
                             >
-                              <item.icon
-                                className="h-6 w-6 shrink-0"
-                                aria-hidden="true"
-                              />
+                              <span className="h-6 w-6 shrink-0">{item.icon}</span>
                               {item.name}
-                            </a>
+                            </Link>
                           </li>
                         ))}
                       </ul>
                     </li>
                   </ul>
                 </nav>
-              </aside>
+              </div>
             </Dialog.Panel>
           </Transition.Child>
         </div>

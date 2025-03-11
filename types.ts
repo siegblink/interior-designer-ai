@@ -12,6 +12,7 @@ export interface ModelParameter {
 }
 
 export interface ModelOutput {
+//   input: string;
   output: string;
   mask?: string;
 }
