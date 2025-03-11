@@ -429,7 +429,7 @@ export default function HomePage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col py-10 lg:pl-72">
+    <main className="flex min-h-screen flex-col bg-black py-10 lg:pl-72">
       {error ? <ErrorNotification errorMessage={error} /> : null}
 
       <section className="mx-4 lg:mx-6 xl:mx-8">
@@ -448,7 +448,7 @@ export default function HomePage() {
           <div className="flex">
             <div className="ml-3">
               <p className="text-sm font-medium text-yellow-800">
-                For best results, please use JPG or JPEG images. Some models may not work well with other formats.
+                For better results, please use JPG or JPEG images. Some models may not work well with other formats.
               </p>
             </div>
           </div>
@@ -471,76 +471,74 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* {file && ( */}
-        <section className="mx-4 mt-9 space-y-4 lg:mx-6 xl:mx-8">
-          <div className="w-full">
-            <SelectMenu
-              label="Model"
-              options={models.map(m => m.name)}
-              selected={selectedModel.name}
-              onChange={(name) => {
-                const model = models.find(m => m.name === name);
-                if (model) {
-                  setSelectedModel(model);
-                  setModelValues({}); // Reset values when model changes
-                  setShowAdvancedOptions(false); // Hide advanced options when model changes
-                }
-              }}
+      <section className="mx-4 mt-9 space-y-4 lg:mx-6 xl:mx-8">
+        <div className="w-full">
+          <SelectMenu
+            label="Model"
+            options={models.map(m => m.name)}
+            selected={selectedModel.name}
+            onChange={(name) => {
+              const model = models.find(m => m.name === name);
+              if (model) {
+                setSelectedModel(model);
+                setModelValues({}); // Reset values when model changes
+                setShowAdvancedOptions(false); // Hide advanced options when model changes
+              }
+            }}
+          />
+        </div>
+
+        {selectedModel.parameters.length > 0 && (
+          <div className="mt-6">
+            <ModelParameters
+              parameters={selectedModel.parameters}
+              values={modelValues}
+              onChange={handleParameterChange}
+              showAdvanced={showAdvancedOptions}
+              onToggleAdvanced={() => setShowAdvancedOptions(!showAdvancedOptions)}
             />
           </div>
+        )}
 
-          {selectedModel.parameters.length > 0 && (
-            <div className="mt-6">
-              <ModelParameters
-                parameters={selectedModel.parameters}
-                values={modelValues}
-                onChange={handleParameterChange}
-                showAdvanced={showAdvancedOptions}
-                onToggleAdvanced={() => setShowAdvancedOptions(!showAdvancedOptions)}
+        {!showAdvancedOptions && (
+          <div className="mt-6 flex flex-row gap-2 sm:grid-cols-2">
+            {selectedModel.requiresStyle && (
+              <SelectMenu
+                label="Style"
+                options={themes}
+                selected={theme}
+                onChange={setTheme}
               />
-            </div>
-          )}
-
-          {!showAdvancedOptions && (
-            <div className="mt-6 flex flex-row gap-2 sm:grid-cols-2">
-              {selectedModel.requiresStyle && (
-                <SelectMenu
-                  label="Style"
-                  options={themes}
-                  selected={theme}
-                  onChange={setTheme}
-                />
-              )}
-              {selectedModel.requiresRoomType && (
-                <SelectMenu
-                  label="Room type"
-                  options={rooms}
-                  selected={room}
-                  onChange={setRoom}
-                />
-              )}
-            </div>
-          )}
-
-          <div className="mt-10 flex justify-start">
-            <button
-              type="button"
-              disabled={loading}
-              onClick={submitImage}
-              className={`${
-                loading
-                  ? "cursor-not-allowed bg-indigo-300 text-gray-300 hover:bg-indigo-300 hover:text-gray-300"
-                  : "bg-indigo-600 text-white hover:bg-indigo-500"
-              } inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 lg:px-3.5 lg:py-2.5`}
-            >
-              Design this room
-              <SparklesIcon className="ml-2 h-4 w-4 text-gray-300" />
-            </button>
+            )}
+            {selectedModel.requiresRoomType && (
+              <SelectMenu
+                label="Room type"
+                options={rooms}
+                selected={room}
+                onChange={setRoom}
+              />
+            )}
           </div>
-        </section>
-      {/* )} */}
+        )}
 
-      <section className="mt-10 px-4 lg:px-6 xl:px-8">
+        <div className="mt-10 flex justify-start">
+          <button
+            type="button"
+            disabled={loading}
+            onClick={submitImage}
+            className={`${
+              loading
+                ? "cursor-not-allowed bg-indigo-300 text-gray-300 hover:bg-indigo-300 hover:text-gray-300"
+                : "bg-indigo-600 text-white hover:bg-indigo-500"
+            } inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 lg:px-3.5 lg:py-2.5`}
+          >
+            Design this room
+            <SparklesIcon className="ml-2 h-4 w-4 text-gray-300" />
+          </button>
+        </div>
+      </section>
+
+      <section className="mx-4 mt-10 lg:mx-6 xl:mx-8">
         {(loading || outputImage) && (
           <ImageOutput
             title={`AI-generated output goes here`}
@@ -564,7 +562,7 @@ export default function HomePage() {
         )}
       </section>
 
-      <section className="mt-10 px-4 lg:px-6 xl:px-8">
+      <section className="mx-4 mt-10 lg:mx-6 xl:mx-8">
         <RecentHistory items={historyItems} />
       </section>
     </main>
