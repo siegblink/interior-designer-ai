@@ -37,8 +37,54 @@ type ImageOutputProps = ImageAreaProps & {
   downloadOutputImage(): void;
 };
 
-const themes = ["Modern", "Vintage", "Minimalist", "Professional"];
-const rooms = ["Living Room", "Dining Room", "Bedroom", "Bathroom", "Office"];
+const themes = [
+  "Modern",
+  "Vintage",
+  "Minimalist",
+  "Professional",
+  "Industrial",
+  "Scandinavian",
+  "Bohemian",
+  "Contemporary",
+  "Traditional",
+  "Mid-Century Modern",
+  "Coastal",
+  "Rustic",
+  "Art Deco",
+  "Japanese Zen",
+  "Mediterranean"
+];
+
+const rooms = [
+  "Living Room",
+  "Dining Room",
+  "Bedroom",
+  "Bathroom",
+  "Office",
+  "Kitchen",
+  "Master Bedroom",
+  "Kids Room",
+  "Home Theater",
+  "Study Room",
+  "Entryway",
+  "Walk-in Closet",
+  "Game Room",
+  "Home Gym",
+  "Laundry Room",
+  "Patio",
+  "Garden",
+  "Art Studio",
+  "Music Room",
+  "Home Office",
+  "Guest Room",
+  "Nursery",
+  "Home Spa",
+  "Home Bar",
+  "Home Library",
+  "Home Theater",
+  "Home Gym",
+  "Home Spa"
+];
 
 const acceptedFileTypes = {
   "image/jpeg": [".jpeg", ".jpg", ".png"],
