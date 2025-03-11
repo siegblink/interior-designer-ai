@@ -21,6 +21,27 @@ export function ImageWithActions({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  // Add function to validate if string is a valid URL
+  const isValidUrl = (urlString: string): boolean => {
+    try {
+      if(!urlString.startsWith("http")){
+        return false;
+      }
+      // Check if it's a relative path starting with /
+      if (urlString.startsWith('/')) {
+        console.log("🚀 ~ isValidUrl ~ urlString:", urlString)
+        return true;
+      }
+      // Check if it's a valid URL
+      new URL(urlString);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const isUrlShareable = isValidUrl(imageUrl);
+
   const downloadImage = () => {
     saveAs(imageUrl, filename);
   };
@@ -29,9 +50,9 @@ export function ImageWithActions({
     try {
       await navigator.clipboard.writeText(imageUrl);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy:', err);
+      console.error('Failed to copy URL:', err);
     }
   };
 
@@ -53,8 +74,17 @@ export function ImageWithActions({
         </button>
         <button
           onClick={copyToClipboard}
-          className="group rounded bg-yellow-500 p-2 text-black"
-          title={copied ? "Copied!" : "Copy share link"}
+          className={`group rounded bg-yellow-500 p-2 text-black transition-all ${
+            isUrlShareable 
+              ? 'hover:bg-yellow-400' 
+              : 'cursor-not-allowed'
+          }`}
+          title={
+            isUrlShareable 
+              ? (copied ? "Copied!" : "Copy share link")
+              : "Sharing not available for this image"
+          }
+          disabled={!isUrlShareable}
         >
           {copied ? (
             <FaCheck className="h-4 w-4 duration-300 group-hover:scale-110" />

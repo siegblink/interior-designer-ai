@@ -17,6 +17,7 @@ import { AIModel, ModelValues } from "../types";
 import { useHistory } from './context/HistoryContext';
 import { RecentHistory } from './components/RecentHistory';
 import { ImageWithActions } from "./components/ImageWithActions";
+import { ExampleImages } from "./components/ExampleImages";
 
 type ErrorNotificationProps = {
   errorMessage: string;
@@ -428,6 +429,35 @@ export default function HomePage() {
     }));
   }
 
+  const handleExampleImageSelect = async (imageUrl: string) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const filename = imageUrl.split('/').pop() ?? 'example.jpg';
+      const file = new File([blob], filename, { type: 'image/jpeg' });
+      
+      setFile(file);
+      convertImageToBase64(file);
+    } catch (error) {
+      console.error('Error loading example image:', error);
+      setError('Failed to load example image');
+    }
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const imageUrl = e.dataTransfer.getData('text/plain');
+    console.log("🚀 ~ handleDrop ~ imageUrl:", imageUrl)
+    if (imageUrl.startsWith('/assets/')) {
+      handleExampleImageSelect(imageUrl);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+  };
+
   return (
     <main className="flex min-h-screen flex-col bg-black py-10 lg:pl-72">
       {error ? <ErrorNotification errorMessage={error} /> : null}
@@ -444,6 +474,13 @@ export default function HomePage() {
           </div>
         </div>
 
+        <div className="mb-8">
+          <h4 className="mb-2 text-sm font-medium text-gray-400">
+            Or choose from our example images:
+          </h4>
+          <ExampleImages onImageSelect={handleExampleImageSelect} />
+        </div>
+
         <div className="mt-4 rounded-md bg-yellow-50 p-4">
           <div className="flex">
             <div className="ml-3">
@@ -454,7 +491,11 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="mt-6">
+        <div 
+          className="mt-6"
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+        >
           {!file && selectedModel.requiresImage ? (
             <ImageDropzone
               title={`Drag 'n drop your image here or click to upload`}
@@ -502,20 +543,20 @@ export default function HomePage() {
 
         {!showAdvancedOptions && (
           <div className="mt-6 flex flex-row gap-2 sm:grid-cols-2">
-            {selectedModel.requiresStyle && (
-              <SelectMenu
-                label="Style"
-                options={themes}
-                selected={theme}
-                onChange={setTheme}
-              />
-            )}
             {selectedModel.requiresRoomType && (
               <SelectMenu
                 label="Room type"
                 options={rooms}
                 selected={room}
                 onChange={setRoom}
+              />
+            )}
+            {selectedModel.requiresStyle && (
+              <SelectMenu
+                label="Style"
+                options={themes}
+                selected={theme}
+                onChange={setTheme}
               />
             )}
           </div>

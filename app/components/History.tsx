@@ -58,7 +58,7 @@ export function History({ items }: HistoryProps) {
             {roomItems.map((item) => (
               <div key={item.id} className="relative space-y-2 rounded-lg border border-gray-700 p-4">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-400">{item.theme}</span>
+                  <span className="text-sm text-gray-400">{`${item.roomType} - ${item.theme}`}</span>
                   <span className="text-sm text-gray-400">
                     {new Date(item.timestamp).toLocaleDateString()}
                   </span>
@@ -78,9 +78,6 @@ export function History({ items }: HistoryProps) {
                     containerClassName="relative"
                     imageClassName="h-40 w-full rounded object-cover"
                   />
-                </div>
-                <div className="mt-2 text-sm text-gray-400">
-                  {item.roomType}
                 </div>
               </div>
             ))}

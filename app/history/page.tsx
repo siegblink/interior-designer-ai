@@ -10,7 +10,7 @@ export default function HistoryPage() {
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   return (
-    <main className="flex min-h-screen flex-col py-10 lg:pl-72">
+    <main className="flex min-h-screen bg-black flex-col py-10 lg:pl-72">
       <div className="mx-4 flex items-center justify-between lg:mx-6 xl:mx-8">
         <h1 className="text-3xl font-bold text-gray-300">Design History</h1>
         {historyItems.length > 0 && (
