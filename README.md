@@ -1,6 +1,16 @@
-## Interior Designer AI
+# Interior Designer AI
 
 ![Interior design image](public/app-screenshot.png)
+
+A modern, AI-powered application for transforming interior spaces with cutting-edge design. Upload a photo of your room and get a redesigned space in seconds.
+
+## Features
+
+- **Modern UI** with glassmorphism effects and fluid animations
+- **AI-Powered Design** transformation using Replicate API
+- **Multiple Design Styles** including Modern, Vintage, Minimalist, and Professional
+- **Various Room Types** such as Living Room, Dining Room, Bedroom, Bathroom, and Office
+- **Responsive Design** that works on both desktop and mobile devices
 
 ## How to use
 
@@ -9,7 +19,7 @@
 In your Terminal app
 
 - Type `git clone git@github.com:siegblink/interior-designer-ai.git`
-- Or type `git clone https://github.com/siegblink/interior-designer-ai.git`
+- Or type `git clone https://github.com:yourname/interior-designer-ai.git` if you've forked the repo
 
 ### 2. Install the project dependencies
 
@@ -46,3 +56,20 @@ Back in your Terminal in the project directory, type `npm run dev`
 ### 9. See the running application in your browser at `localhost:3000`
 
 ![see-running-app](public/see-running-app.png)
+
+## Technologies Used
+
+- **Next.js** - React framework for production
+- **React** - UI component library
+- **Tailwind CSS** - Utility-first CSS framework
+- **Framer Motion** - Animation library for React
+- **Headless UI** - Unstyled, accessible UI components
+- **Replicate API** - For AI-powered design transformations
+
+## Contributing
+
+Contributions are welcome! Please check out our [contribution guidelines](CONTRIBUTING.md) first.
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
