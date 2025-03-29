@@ -18,7 +18,7 @@ A modern, AI-powered application for transforming interior spaces with cutting-e
 
 In your Terminal app
 
-- Type `git clone git@github.com:siegblink/interior-designer-ai.git`
+- Type `git clone git@github.com:azizbekdevuz/interior-designer-ai.git`
 - Or type `git clone https://github.com:yourname/interior-designer-ai.git` if you've forked the repo
 
 ### 2. Install the project dependencies
