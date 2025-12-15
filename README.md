@@ -32,12 +32,26 @@ Go to the project's directory
 
 ### 6. Rename the `.env.example` file to `.env.local`
 
-### 7. In `.env.local`, replace the placeholder _your_api_token_ with your API token
+### 7. In `.env.local`, replace the placeholders with your actual values
 
 ```
 # Replace 'your-api-token' with your own API token from replicate
 REPLICATE_API_TOKEN=your_api_token
+
+# NextAuth v5 Configuration (uses AUTH_ prefix)
+AUTH_SECRET=your-auth-secret-key-here
+AUTH_URL=http://localhost:3000
+
+# GitHub OAuth (Get from https://github.com/settings/developers)
+AUTH_GITHUB_ID=your_github_client_id
+AUTH_GITHUB_SECRET=your_github_client_secret
+
+# Google OAuth (Get from https://console.cloud.google.com/apis/credentials)
+AUTH_GOOGLE_ID=your_google_client_id
+AUTH_GOOGLE_SECRET=your_google_client_secret
 ```
+
+**Note:** To generate `AUTH_SECRET`, you can run: `openssl rand -base64 32`
 
 ### 8. Run the project
 
