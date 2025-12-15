@@ -1,10 +1,19 @@
+"use client";
+
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import { navigation } from "@/common";
 import { classNames } from "@/utils";
 import Link from "next/link";
+import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
 
 export function DesktopSidebar() {
   const pathName = usePathname();
+  const { data: session } = useSession();
+
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: "/login" });
+  };
 
   return (
     <aside className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
@@ -41,6 +50,43 @@ export function DesktopSidebar() {
                 ))}
               </ul>
             </li>
+            {session && (
+              <li className="mt-auto">
+                <div className="border-t border-gray-700 pt-4">
+                  {session.user && (
+                    <div className="mb-3 px-2">
+                      <div className="flex items-center gap-x-3">
+                        {session.user.image && (
+                          <img
+                            className="h-8 w-8 rounded-full"
+                            src={session.user.image}
+                            alt={session.user.name || "User"}
+                          />
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-semibold text-white">
+                            {session.user.name || "User"}
+                          </p>
+                          <p className="truncate text-xs text-gray-400">
+                            {session.user.email}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <button
+                    onClick={handleSignOut}
+                    className="group flex w-full gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 transition-all duration-300 hover:bg-gray-800 hover:text-white"
+                  >
+                    <ArrowRightOnRectangleIcon
+                      className="h-6 w-6 shrink-0"
+                      aria-hidden="true"
+                    />
+                    Sign out
+                  </button>
+                </div>
+              </li>
+            )}
           </ul>
         </nav>
       </div>
