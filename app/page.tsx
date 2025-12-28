@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { saveAs } from "file-saver";
-import { FileRejection } from "react-dropzone";
+import { FileRejection } from "@/app/hooks/useDropzone";
 import { PhotoIcon } from "@heroicons/react/24/outline";
 import { SparklesIcon } from "@heroicons/react/24/outline";
 import { SelectMenu } from "@/app/selectmenu";

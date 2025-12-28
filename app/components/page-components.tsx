@@ -1,11 +1,10 @@
 import { XCircleIcon } from "@heroicons/react/20/solid";
-import { PhotoIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import { SparklesIcon } from "@heroicons/react/24/outline";
 import { FaTrashAlt, FaDownload } from "react-icons/fa";
 import { ThreeDots } from "react-loader-spinner";
 import { motion, AnimatePresence } from "framer-motion";
-import Dropzone from "react-dropzone";
 import { ImageAreaProps } from "@/types";
-import { FileRejection } from "react-dropzone";
+import { useDropzone, FileRejection } from "@/app/hooks/useDropzone";
 
 type ErrorNotificationProps = {
   errorMessage: string;
@@ -291,81 +290,79 @@ function ImageDropzone(
     onImageDrop(acceptedFiles: File[], rejectedFiles: FileRejection[]): void;
   }
 ) {
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: props.onImageDrop,
+    accept: acceptedFileTypes,
+    maxSize: maxFileSize,
+    multiple: false,
+  });
+
   return (
-    <Dropzone
-      onDrop={props.onImageDrop}
-      accept={acceptedFileTypes}
-      maxSize={maxFileSize}
-      multiple={false}
-    >
-      {({ getRootProps, getInputProps, isDragActive }) => (
-        <>
-          <input {...getInputProps()} />
-          <div
-            {...getRootProps()}
-            className={`relative min-h-[350px] w-full rounded-2xl border-2 border-dashed ${
-              isDragActive
-                ? "border-indigo-400 bg-indigo-900/20"
-                : "border-gray-700 bg-gray-900/30"
-            } flex flex-col items-center justify-center p-8 text-center shadow-2xl backdrop-blur-sm transition-colors duration-200`}
-          >
+    <>
+      <input {...getInputProps()} />
+      <div
+        {...getRootProps()}
+        className={`relative min-h-[350px] w-full rounded-2xl border-2 border-dashed ${
+          isDragActive
+            ? "border-indigo-400 bg-indigo-900/20"
+            : "border-gray-700 bg-gray-900/30"
+        } flex flex-col items-center justify-center p-8 text-center shadow-2xl backdrop-blur-sm transition-colors duration-200`}
+      >
+        <div
+          className={`flex flex-col items-center ${
+            isDragActive ? "animate-bounce-subtle" : ""
+          }`}
+        >
+          <div className="relative mb-4 h-20 w-20">
             <div
-              className={`flex flex-col items-center ${
-                isDragActive ? "animate-bounce-subtle" : ""
-              }`}
-            >
-              <div className="relative mb-4 h-20 w-20">
-                <div
-                  className={`absolute inset-0 rounded-full ${
-                    isDragActive ? "bg-indigo-500/30" : "bg-gray-800/50"
-                  } animate-pulse`}
-                ></div>
-                <div className="relative flex h-full w-full items-center justify-center">
-                  <props.icon
-                    className={`h-10 w-10 ${
-                      isDragActive ? "text-indigo-300" : "text-gray-400"
-                    }`}
-                  />
-                </div>
-              </div>
-
-              <span
-                className={`text-sm font-medium ${
-                  isDragActive ? "text-indigo-200" : "text-gray-300"
-                } max-w-xs`}
-              >
-                {isDragActive ? "Drop your image here..." : props.title}
-              </span>
-
-              {!isDragActive && (
-                <span className="mt-2 text-xs text-gray-500">
-                  Supports JPEG, JPG, and PNG (max 5MB)
-                </span>
-              )}
-
-              {!isDragActive && (
-                <div className="mt-6">
-                  <span className="inline-flex h-8 items-center rounded-full bg-blue-900/20 px-3 text-xs font-medium text-blue-300">
-                    Click or drag to upload
-                  </span>
-                </div>
-              )}
+              className={`absolute inset-0 rounded-full ${
+                isDragActive ? "bg-indigo-500/30" : "bg-gray-800/50"
+              } animate-pulse`}
+            ></div>
+            <div className="relative flex h-full w-full items-center justify-center">
+              <props.icon
+                className={`h-10 w-10 ${
+                  isDragActive ? "text-indigo-300" : "text-gray-400"
+                }`}
+              />
             </div>
-
-            {/* Animated border effect when dragging */}
-            {isDragActive && (
-              <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
-                <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-blue-600/20 via-indigo-600/20 to-purple-600/20"></div>
-                <div className="absolute left-0 top-0 h-[3px] w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"></div>
-                <div className="absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500"></div>
-                <div className="absolute left-0 top-0 h-full w-[3px] bg-gradient-to-b from-blue-500 via-indigo-500 to-purple-500"></div>
-                <div className="absolute right-0 top-0 h-full w-[3px] bg-gradient-to-b from-purple-500 via-indigo-500 to-blue-500"></div>
-              </div>
-            )}
           </div>
-        </>
-      )}
-    </Dropzone>
+
+          <span
+            className={`text-sm font-medium ${
+              isDragActive ? "text-indigo-200" : "text-gray-300"
+            } max-w-xs`}
+          >
+            {isDragActive ? "Drop your image here..." : props.title}
+          </span>
+
+          {!isDragActive && (
+            <span className="mt-2 text-xs text-gray-500">
+              Supports JPEG, JPG, and PNG (max 5MB)
+            </span>
+          )}
+
+          {!isDragActive && (
+            <div className="mt-6">
+              <span className="inline-flex h-8 items-center rounded-full bg-blue-900/20 px-3 text-xs font-medium text-blue-300">
+                Click or drag to upload
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Animated border effect when dragging */}
+        {isDragActive && (
+          <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
+            <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-blue-600/20 via-indigo-600/20 to-purple-600/20"></div>
+            <div className="absolute left-0 top-0 h-[3px] w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"></div>
+            <div className="absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500"></div>
+            <div className="absolute left-0 top-0 h-full w-[3px] bg-gradient-to-b from-blue-500 via-indigo-500 to-purple-500"></div>
+            <div className="absolute right-0 top-0 h-full w-[3px] bg-gradient-to-b from-purple-500 via-indigo-500 to-blue-500"></div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
