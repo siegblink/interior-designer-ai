@@ -10,25 +10,25 @@
     "prepare": "bun --bun husky"
   },
   "dependencies": {
-    "@headlessui/react": "^1.7.15",
+    "@headlessui/react": "2.2.9",
     "@heroicons/react": "^2.2.0",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",
-    "@types/node": "^22",
-    "@types/react": "^18.3",
-    "@types/react-dom": "^18.3",
+    "@types/node": "25.0.3",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
     "@vercel/analytics": "^1.4.1",
     "autoprefixer": "^10.4.20",
     "file-saver": "^2.0.5",
     "framer-motion": "^12.5.3",
-    "next": "14.2.35",
+    "next": "16.1.1",
     "postcss": "^8.4.49",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-icons": "^4.12.0",
-    "react-loader-spinner": "^6.1.6",
-    "replicate": "^0.34.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-icons": "5.5.0",
+    "react-loader-spinner": "8.0.0",
+    "replicate": "1.4.0",
     "tailwindcss": "^3.4.17",
     "typescript": "5.9.3"
   },
@@ -37,7 +37,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",
-    "prettier-plugin-tailwindcss": "^0.6.10"
+    "prettier-plugin-tailwindcss": "0.7.2"
   },
   "lint-staged": {
     "*.{js,ts,tsx,jsx,css,md}": "prettier --write"

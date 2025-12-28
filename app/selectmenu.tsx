@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import { classNames } from "@/utils";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
@@ -48,7 +47,6 @@ export function SelectMenu({
 
             <Transition
               show={open}
-              as={Fragment}
               leave="transition ease-in duration-100"
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
