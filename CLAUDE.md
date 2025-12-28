@@ -10,11 +10,21 @@ Interior Designer AI is a Next.js 14 application that transforms room photos usi
 
 ### Essential Commands
 
-- **Start dev server**: `npm run dev` (runs on http://localhost:3000)
-- **Build production**: `npm run build`
-- **Start production**: `npm start`
-- **Lint code**: `npm run lint`
-- **Format code**: `npx prettier --write .` (automatically runs on commit via husky)
+- **Start dev server**: `bun dev` (runs on http://localhost:3000)
+- **Build production**: `bun build`
+- **Start production**: `bun start`
+- **Lint code**: `bun lint`
+- **Format code**: `bunx prettier --write .` (automatically runs on commit via husky)
+
+### Package Management
+
+- **Install dependencies**: `bun install`
+- **Add dependency**: `bun add <package>`
+- **Add dev dependency**: `bun add -d <package>`
+- **Remove dependency**: `bun remove <package>`
+- **Execute package binary**: `bunx <command>`
+
+**Note:** This project uses Bun as the package manager. Bun is recommended for optimal performance, though NPM/Node.js will also work (see .nvmrc).
 
 ### Environment Setup
 
