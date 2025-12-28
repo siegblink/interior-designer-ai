@@ -1,6 +1,6 @@
 # Interior Designer AI
 
-![Interior design image](public/app-screenshot.png)
+![interior-design-image](public/app-screenshot.png)
 
 A modern, AI-powered application for transforming interior spaces with cutting-edge design. Upload a photo of your room and get a redesigned space in seconds.
 
@@ -46,7 +46,7 @@ Go to the project's directory
 
 ```
 # Replace 'your-api-token' with your own API token from replicate
-REPLICATE_API_TOKEN=your_api_token
+REPLICATE_API_TOKEN=your-api-token
 ```
 
 ### 8. Run the project
