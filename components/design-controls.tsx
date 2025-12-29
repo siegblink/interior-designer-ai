@@ -32,51 +32,54 @@ export function DesignControls({
   canGenerate,
 }: DesignControlsProps) {
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-      <div className="flex-1 space-y-2">
-        <label className="text-sm font-medium">Design Theme</label>
-        <Select
-          value={selectedTheme}
-          onValueChange={(value) => onThemeChange(value as DesignTheme)}
-          disabled={isLoading}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select theme" />
-          </SelectTrigger>
-          <SelectContent>
-            {DESIGN_THEMES.map((theme) => (
-              <SelectItem key={theme} value={theme}>
-                {theme}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row">
+        <div className="flex-1 space-y-2">
+          <label className="text-sm font-medium">Design Theme</label>
+          <Select
+            value={selectedTheme}
+            onValueChange={(value) => onThemeChange(value as DesignTheme)}
+            disabled={isLoading}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select theme" />
+            </SelectTrigger>
+            <SelectContent>
+              {DESIGN_THEMES.map((theme) => (
+                <SelectItem key={theme} value={theme}>
+                  {theme}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-      <div className="flex-1 space-y-2">
-        <label className="text-sm font-medium">Room Type</label>
-        <Select
-          value={selectedRoom}
-          onValueChange={(value) => onRoomChange(value as RoomType)}
-          disabled={isLoading}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select room" />
-          </SelectTrigger>
-          <SelectContent>
-            {ROOM_TYPES.map((room) => (
-              <SelectItem key={room} value={room}>
-                {room}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex-1 space-y-2">
+          <label className="text-sm font-medium">Room Type</label>
+          <Select
+            value={selectedRoom}
+            onValueChange={(value) => onRoomChange(value as RoomType)}
+            disabled={isLoading}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select room" />
+            </SelectTrigger>
+            <SelectContent>
+              {ROOM_TYPES.map((room) => (
+                <SelectItem key={room} value={room}>
+                  {room}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <Button
+        size="lg"
         onClick={onGenerate}
         disabled={!canGenerate || isLoading}
-        className="sm:w-auto"
+        className="w-full md:w-fit"
       >
         {isLoading ? (
           <>
@@ -86,7 +89,7 @@ export function DesignControls({
         ) : (
           <>
             <Wand2 />
-            Design this room
+            Generate Design
           </>
         )}
       </Button>
