@@ -40,7 +40,7 @@ export function OutputImage({ src, isLoading }: OutputImageProps) {
   if (!src) {
     return (
       <Card className="border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50">
-        <CardContent className="flex min-h-[300px] items-center justify-center p-8">
+        <CardContent className="flex aspect-[4/3] items-center justify-center p-8">
           <p className="text-center text-muted-foreground">
             Your AI-generated design will appear here
           </p>

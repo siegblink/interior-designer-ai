@@ -36,7 +36,7 @@ export function ImageDropzone({ onImageUpload, onError }: ImageDropzoneProps) {
       <CardContent className="p-0">
         <div
           {...getRootProps()}
-          className="flex min-h-[300px] flex-col items-center justify-center p-8"
+          className="flex aspect-[4/3] flex-col items-center justify-center p-8"
         >
           <input {...getInputProps()} />
           <div className="flex flex-col items-center gap-4 text-center">

@@ -7,6 +7,7 @@ import { UploadedImage } from "@/components/uploaded-image";
 import { OutputImage } from "@/components/output-image";
 import { DesignControls } from "@/components/design-controls";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Separator } from "@/components/ui/separator";
 import { AlertCircle } from "lucide-react";
 import type { RoomType, DesignTheme } from "@/types";
 
@@ -97,6 +98,8 @@ export default function HomePage() {
         isLoading={isLoading}
         canGenerate={!!uploadedImage}
       />
+
+      <Separator />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="space-y-2">
