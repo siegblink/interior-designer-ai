@@ -14,7 +14,6 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
 
 const navItems = [
   { title: "Design", icon: Home, href: "/" },
@@ -28,7 +27,7 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="p-4 group-data-[collapsible=icon]:p-2">
         <div className="flex flex-col gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <div className="bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-lg">
             <Palette className="h-4 w-4" />
           </div>
           <span className="font-semibold group-data-[collapsible=icon]:hidden">
