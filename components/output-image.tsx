@@ -26,8 +26,8 @@ export function OutputImage({ src, isLoading }: OutputImageProps) {
           <div className="relative aspect-[4/3]">
             <Skeleton className="h-full w-full" />
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-              <Sparkles className="h-8 w-8 animate-pulse text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">
+              <Sparkles className="text-muted-foreground h-8 w-8 animate-pulse" />
+              <p className="text-muted-foreground text-sm">
                 Generating your design...
               </p>
             </div>
@@ -39,9 +39,9 @@ export function OutputImage({ src, isLoading }: OutputImageProps) {
 
   if (!src) {
     return (
-      <Card className="border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50">
+      <Card className="border-muted-foreground/25 hover:border-muted-foreground/50 border-2 border-dashed">
         <CardContent className="flex aspect-[4/3] items-center justify-center p-8">
-          <p className="text-center text-muted-foreground">
+          <p className="text-muted-foreground text-center">
             Your AI-generated design will appear here
           </p>
         </CardContent>
@@ -63,7 +63,7 @@ export function OutputImage({ src, isLoading }: OutputImageProps) {
         <Button
           variant="secondary"
           size="icon"
-          className="absolute right-2 top-2"
+          className="absolute top-2 right-2"
           onClick={handleDownload}
         >
           <Download className="h-4 w-4" />

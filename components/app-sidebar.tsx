@@ -1,45 +1,73 @@
 "use client";
 
-import { Home, Palette, Settings, HelpCircle } from "lucide-react";
+import { Home, Palette, Settings, HelpCircle, Blocks } from "lucide-react";
 import Link from "next/link";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail,
 } from "@/components/ui/sidebar";
 
 const navItems = [
-  { title: "Design", icon: Home, href: "/" },
-  { title: "Gallery", icon: Palette, href: "/gallery", disabled: true },
-  { title: "Settings", icon: Settings, href: "/settings", disabled: true },
-  { title: "Help", icon: HelpCircle, href: "/help", disabled: true },
+  {
+    title: "Design",
+    icon: Home,
+    href: "/",
+    disabled: false,
+  },
+  {
+    title: "Gallery",
+    icon: Blocks,
+    href: "/gallery",
+    disabled: false,
+  },
+  {
+    title: "Settings",
+    icon: Settings,
+    href: "/settings",
+    disabled: false,
+  },
+  {
+    title: "Help",
+    icon: HelpCircle,
+    href: "/help",
+    disabled: false,
+  },
 ];
 
-export function AppSidebar() {
+type Props = {
+  variant: "inset" | "floating";
+};
+
+export function AppSidebar({ variant }: Props) {
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader className="p-4 group-data-[collapsible=icon]:p-2">
-        <div className="flex flex-col gap-2">
-          <div className="bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-lg">
-            <Palette className="h-4 w-4" />
-          </div>
-          <span className="font-semibold group-data-[collapsible=icon]:hidden">
-            Interior Designer
-          </span>
-        </div>
+    <Sidebar collapsible="icon" variant={variant}>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              className="data-[slot=sidebar-menu-button]:!p-1.5"
+            >
+              <Link href="/">
+                <Palette className="size-5!" />
+                <span className="text-base font-semibold">
+                  Interior Designer
+                </span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-          <SidebarGroupContent>
+          <SidebarGroupContent className="flex flex-col gap-2">
             <SidebarMenu>
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
@@ -48,21 +76,10 @@ export function AppSidebar() {
                     disabled={item.disabled}
                     tooltip={item.title}
                   >
-                    {item.disabled ? (
-                      <span className="flex items-center gap-2 opacity-50">
-                        <item.icon className="h-4 w-4" />
-                        <span className="group-data-[collapsible=icon]:hidden">
-                          {item.title}
-                        </span>
-                      </span>
-                    ) : (
-                      <Link href={item.href}>
-                        <item.icon className="h-4 w-4" />
-                        <span className="group-data-[collapsible=icon]:hidden">
-                          {item.title}
-                        </span>
-                      </Link>
-                    )}
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -70,8 +87,6 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-
-      <SidebarRail />
     </Sidebar>
   );
 }

@@ -1,27 +1,23 @@
-import {
-  SidebarProvider,
-  SidebarTrigger,
-  SidebarInset,
-} from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { Separator } from "@/components/ui/separator";
-import { ThemeToggle } from "@/components/theme-toggle";
+import SiteHeader from "@/components/site-header";
 
-export default function MainLayout({
-  children,
-}: {
+type Props = {
   children: React.ReactNode;
-}) {
+};
+
+export default function MainLayout({ children }: Props) {
+  const style = {
+    "--sidebar-width": "calc(var(--spacing) * 72)",
+    "--header-height": "calc(var(--spacing) * 12)",
+  } as React.CSSProperties;
+
   return (
-    <SidebarProvider>
-      <AppSidebar />
+    <SidebarProvider style={style}>
+      <AppSidebar variant="inset" />
       <SidebarInset>
-        <header className="flex shrink-0 items-center gap-2 border-b p-4">
-          <SidebarTrigger />
-          <div className="flex-1" />
-          <ThemeToggle />
-        </header>
-        <main className="flex-1 p-4 md:p-6">{children}</main>
+        <SiteHeader />
+        <div className="flex-1 overflow-auto p-4 md:p-6">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

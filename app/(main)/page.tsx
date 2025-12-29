@@ -8,6 +8,7 @@ import { OutputImage } from "@/components/output-image";
 import { DesignControls } from "@/components/design-controls";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 import type { RoomType, DesignTheme } from "@/types";
 
@@ -74,13 +75,6 @@ export default function HomePage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <p className="text-muted-foreground">
-          Upload a photo of your room and let AI reimagine it with a new design
-          style.
-        </p>
-      </div>
-
       {error && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
@@ -89,23 +83,31 @@ export default function HomePage() {
         </Alert>
       )}
 
-      <DesignControls
-        selectedTheme={selectedTheme}
-        selectedRoom={selectedRoom}
-        onThemeChange={setSelectedTheme}
-        onRoomChange={setSelectedRoom}
-        onGenerate={handleGenerate}
-        isLoading={isLoading}
-        canGenerate={!!uploadedImage}
-      />
+      <Card>
+        <CardHeader>
+          <CardTitle className="leading-relaxed">
+            Upload a photo of your room and let AI reimagine it with a new
+            design style
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <DesignControls
+            selectedTheme={selectedTheme}
+            selectedRoom={selectedRoom}
+            onThemeChange={setSelectedTheme}
+            onRoomChange={setSelectedRoom}
+            onGenerate={handleGenerate}
+            isLoading={isLoading}
+            canGenerate={!!uploadedImage}
+          />
+        </CardContent>
+      </Card>
 
       <Separator />
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="space-y-2">
-          <h2 className="text-sm font-medium text-muted-foreground">
-            Original Photo
-          </h2>
+        <div className="space-y-3">
+          <h2 className="text-sm font-medium">Original Photo</h2>
           {uploadedImage ? (
             <UploadedImage src={uploadedImage} onRemove={handleRemoveImage} />
           ) : (
@@ -116,10 +118,8 @@ export default function HomePage() {
           )}
         </div>
 
-        <div className="space-y-2">
-          <h2 className="text-sm font-medium text-muted-foreground">
-            AI Design
-          </h2>
+        <div className="space-y-3">
+          <h2 className="text-sm font-medium">AI Design</h2>
           <OutputImage src={outputImage} isLoading={isLoading} />
         </div>
       </div>

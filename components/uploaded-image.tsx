@@ -20,7 +20,7 @@ export function UploadedImage({ src, onRemove }: UploadedImageProps) {
         <Button
           variant="destructive"
           size="icon"
-          className="absolute right-2 top-2"
+          className="absolute top-2 right-2"
           onClick={onRemove}
         >
           <X className="h-4 w-4" />

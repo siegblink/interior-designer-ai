@@ -42,15 +42,15 @@ export function ImageDropzone({ onImageUpload, onError }: ImageDropzoneProps) {
           <div className="flex flex-col items-center gap-4 text-center">
             {isDragActive ? (
               <>
-                <Upload className="h-12 w-12 text-primary" />
+                <Upload className="text-primary h-12 w-12" />
                 <p className="font-semibold">Drop your image here</p>
               </>
             ) : (
               <>
-                <ImageIcon className="h-12 w-12 text-muted-foreground" />
+                <ImageIcon className="text-muted-foreground h-12 w-12" />
                 <div>
                   <p className="font-semibold">Drag and drop your room photo</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     or click to browse (JPEG/PNG, max 5MB)
                   </p>
                 </div>

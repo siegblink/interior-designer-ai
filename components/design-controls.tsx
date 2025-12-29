@@ -33,15 +33,15 @@ export function DesignControls({
 }: DesignControlsProps) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-4">
-        <div className="flex-1 space-y-2 md:w-[calc(50%-1rem)]">
+      <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
+        <div className="flex flex-1 flex-col gap-3">
           <label className="text-sm font-medium">Design Theme</label>
           <Select
             value={selectedTheme}
             onValueChange={(value) => onThemeChange(value as DesignTheme)}
             disabled={isLoading}
           >
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Select theme" />
             </SelectTrigger>
             <SelectContent>
@@ -54,14 +54,14 @@ export function DesignControls({
           </Select>
         </div>
 
-        <div className="flex-1 space-y-2 md:w-[calc(50%-1rem)]">
+        <div className="flex flex-1 flex-col gap-3">
           <label className="text-sm font-medium">Room Type</label>
           <Select
             value={selectedRoom}
             onValueChange={(value) => onRoomChange(value as RoomType)}
             disabled={isLoading}
           >
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Select room" />
             </SelectTrigger>
             <SelectContent>
