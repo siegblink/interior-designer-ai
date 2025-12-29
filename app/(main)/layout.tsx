@@ -5,6 +5,7 @@ import {
 } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Separator } from "@/components/ui/separator";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function MainLayout({
   children,
@@ -19,6 +20,8 @@ export default function MainLayout({
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 h-4" />
           <h1 className="text-sm font-medium">Interior Designer AI</h1>
+          <div className="flex-1" />
+          <ThemeToggle />
         </header>
         <main className="flex-1 p-4 md:p-6">{children}</main>
       </SidebarInset>
