@@ -80,12 +80,12 @@ export function DesignControls({
       >
         {isLoading ? (
           <>
-            <Wand2 className="mr-2 h-4 w-4 animate-pulse" />
-            Generating...
+            <Wand2 className="animate-pulse" />
+            Generating
           </>
         ) : (
           <>
-            <Wand2 className="mr-2 h-4 w-4" />
+            <Wand2 />
             Design this room
           </>
         )}
