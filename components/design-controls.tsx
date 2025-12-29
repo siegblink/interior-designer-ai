@@ -33,8 +33,8 @@ export function DesignControls({
 }: DesignControlsProps) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-4 sm:flex-row">
-        <div className="flex-1 space-y-2">
+      <div className="flex flex-col gap-4">
+        <div className="flex-1 space-y-2 md:w-[calc(50%-1rem)]">
           <label className="text-sm font-medium">Design Theme</label>
           <Select
             value={selectedTheme}
@@ -54,7 +54,7 @@ export function DesignControls({
           </Select>
         </div>
 
-        <div className="flex-1 space-y-2">
+        <div className="flex-1 space-y-2 md:w-[calc(50%-1rem)]">
           <label className="text-sm font-medium">Room Type</label>
           <Select
             value={selectedRoom}
