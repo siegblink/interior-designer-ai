@@ -26,13 +26,13 @@ const navItems = [
 export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="p-4">
+      <SidebarHeader className="p-4 group-data-[collapsible=icon]:p-2">
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Palette className="h-4 w-4" />
           </div>
           <span className="font-semibold group-data-[collapsible=icon]:hidden">
-            Interior AI
+            Interior Designer
           </span>
         </div>
       </SidebarHeader>
@@ -54,12 +54,16 @@ export function AppSidebar() {
                     {item.disabled ? (
                       <span className="flex items-center gap-2 opacity-50">
                         <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
+                        <span className="group-data-[collapsible=icon]:hidden">
+                          {item.title}
+                        </span>
                       </span>
                     ) : (
                       <Link href={item.href}>
                         <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
+                        <span className="group-data-[collapsible=icon]:hidden">
+                          {item.title}
+                        </span>
                       </Link>
                     )}
                   </SidebarMenuButton>
