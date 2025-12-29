@@ -16,10 +16,8 @@ export default function MainLayout({
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
-          <h1 className="text-sm font-medium">Interior Designer AI</h1>
+        <header className="flex shrink-0 items-center gap-2 border-b p-4">
+          <SidebarTrigger />
           <div className="flex-1" />
           <ThemeToggle />
         </header>
