@@ -39,7 +39,7 @@ export function OutputImage({ src, isLoading }: OutputImageProps) {
 
   if (!src) {
     return (
-      <Card className="border-dashed">
+      <Card className="border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50">
         <CardContent className="flex min-h-[300px] items-center justify-center p-8">
           <p className="text-center text-muted-foreground">
             Your AI-generated design will appear here
@@ -54,9 +54,9 @@ export function OutputImage({ src, isLoading }: OutputImageProps) {
       <CardContent className="relative p-0">
         <div className="relative aspect-[4/3]">
           <Image
+            fill
             src={src}
             alt="AI generated design"
-            fill
             className="object-cover"
           />
         </div>
