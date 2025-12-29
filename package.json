@@ -6,7 +6,7 @@
     "dev": "bun --bun next dev",
     "build": "bun --bun next build",
     "start": "bun --bun next start",
-    "lint": "bun --bun next lint",
+    "lint": "eslint .",
     "prepare": "bun --bun husky"
   },
   "dependencies": {

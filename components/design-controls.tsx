@@ -2,13 +2,7 @@
 
 import { Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { ROOM_TYPES, DESIGN_THEMES } from "@/lib/constants";
 import type { RoomType, DesignTheme } from "@/types";
 
@@ -36,42 +30,28 @@ export function DesignControls({
       <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
         <div className="flex flex-1 flex-col gap-3">
           <label className="text-sm font-medium">Design Theme</label>
-          <Select
+          <Combobox
+            options={DESIGN_THEMES}
             value={selectedTheme}
-            onValueChange={(value) => onThemeChange(value as DesignTheme)}
+            onValueChange={onThemeChange}
+            placeholder="Select theme..."
+            searchPlaceholder="Search themes..."
+            emptyText="No theme found."
             disabled={isLoading}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select theme" />
-            </SelectTrigger>
-            <SelectContent>
-              {DESIGN_THEMES.map((theme) => (
-                <SelectItem key={theme} value={theme}>
-                  {theme}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          />
         </div>
 
         <div className="flex flex-1 flex-col gap-3">
           <label className="text-sm font-medium">Room Type</label>
-          <Select
+          <Combobox
+            options={ROOM_TYPES}
             value={selectedRoom}
-            onValueChange={(value) => onRoomChange(value as RoomType)}
+            onValueChange={onRoomChange}
+            placeholder="Select room..."
+            searchPlaceholder="Search rooms..."
+            emptyText="No room found."
             disabled={isLoading}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select room" />
-            </SelectTrigger>
-            <SelectContent>
-              {ROOM_TYPES.map((room) => (
-                <SelectItem key={room} value={room}>
-                  {room}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          />
         </div>
       </div>
 
