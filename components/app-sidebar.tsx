@@ -1,0 +1,84 @@
+"use client";
+
+import { Home, Palette, Settings, HelpCircle } from "lucide-react";
+import Link from "next/link";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+} from "@/components/ui/sidebar";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { Separator } from "@/components/ui/separator";
+
+const navItems = [
+  { title: "Design", icon: Home, href: "/" },
+  { title: "Gallery", icon: Palette, href: "/gallery", disabled: true },
+  { title: "Settings", icon: Settings, href: "/settings", disabled: true },
+  { title: "Help", icon: HelpCircle, href: "/help", disabled: true },
+];
+
+export function AppSidebar() {
+  return (
+    <Sidebar collapsible="icon">
+      <SidebarHeader className="p-4">
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Palette className="h-4 w-4" />
+          </div>
+          <span className="font-semibold group-data-[collapsible=icon]:hidden">
+            Interior AI
+          </span>
+        </div>
+      </SidebarHeader>
+
+      <Separator />
+
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild={!item.disabled}
+                    disabled={item.disabled}
+                    tooltip={item.title}
+                  >
+                    {item.disabled ? (
+                      <span className="flex items-center gap-2 opacity-50">
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </span>
+                    ) : (
+                      <Link href={item.href}>
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    )}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter className="p-4">
+        <div className="flex items-center justify-between group-data-[collapsible=icon]:justify-center">
+          <ThemeToggle />
+        </div>
+      </SidebarFooter>
+
+      <SidebarRail />
+    </Sidebar>
+  );
+}
