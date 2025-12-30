@@ -73,11 +73,11 @@ Back in your Terminal in the project directory, type `bun dev`
 
 ## Technologies Used
 
-- **Next.js** - React framework for production
-- **React** - UI component library
-- **Tailwind CSS** - Utility-first CSS framework
-- **Framer Motion** - Animation library for React
-- **Headless UI** - Unstyled, accessible UI components
+- **Next.js 16** - React framework for production
+- **React 19** - UI component library
+- **Tailwind CSS 4** - Utility-first CSS framework
+- **shadcn/ui** - Accessible UI component library built on Radix UI
+- **cmdk** - Command menu for searchable dropdowns
 - **Replicate API** - For AI-powered design transformations
 
 ## Contributing

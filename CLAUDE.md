@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Interior Designer AI is a Next.js 14 application that transforms room photos using AI-powered design generation via Replicate API. The app uses the App Router architecture with TypeScript, Tailwind CSS, and Framer Motion for animations.
+Interior Designer AI is a Next.js 16 application that transforms room photos using AI-powered design generation via Replicate API. The app uses the App Router architecture with TypeScript, Tailwind CSS 4, and shadcn/ui components.
 
 ## Development Commands
 
@@ -36,20 +36,34 @@ Interior Designer AI is a Next.js 14 application that transforms room photos usi
 
 ### Application Structure
 
-This is a **Next.js 14 App Router** application with the following architecture:
+This is a **Next.js 16 App Router** application with route groups and a component-based architecture:
 
 ```
 app/
 ├── api/replicate/route.ts    # API route for Replicate AI integration
-├── components/               # Reusable UI components
-├── hooks/                    # Custom React hooks
-├── page.tsx                  # Main application page (client component)
-├── layout.tsx                # Root layout with metadata
-├── sidebar.tsx               # Sidebar orchestration
-├── header.tsx                # Mobile header
-├── desktop-sidebar.tsx       # Desktop navigation
-├── mobile-sidebar.tsx        # Mobile navigation drawer
-└── selectmenu.tsx            # Dropdown select component
+├── layout.tsx                # Root layout with providers (ThemeProvider)
+└── (main)/
+    ├── layout.tsx            # Main layout with SidebarProvider
+    └── page.tsx              # Home page (client component)
+
+components/
+├── app-sidebar.tsx           # Main sidebar navigation (shadcn/ui Sidebar)
+├── design-controls.tsx       # Theme/room selection with Combobox
+├── image-dropzone.tsx        # Image upload dropzone
+├── output-image.tsx          # Generated image display
+├── site-header.jsx           # Header with sidebar trigger
+├── theme-toggle.tsx          # Dark/light mode toggle
+├── uploaded-image.tsx        # Uploaded image preview
+└── ui/                       # shadcn/ui component primitives
+    ├── combobox.tsx          # Searchable dropdown component
+    ├── sidebar.tsx           # Sidebar primitives
+    ├── button.tsx, card.tsx, etc.
+
+hooks/
+└── use-mobile.tsx            # Mobile detection hook
+
+lib/
+└── constants.ts              # Design themes, room types, validation constants
 ```
 
 ### Key Architectural Patterns
@@ -58,7 +72,7 @@ app/
 
 - All state is managed locally using React hooks (`useState`, `useCallback`, `useEffect`)
 - No external state management library (Redux, Zustand, etc.)
-- Main state lives in `app/page.tsx`: uploaded image, output image, theme, room type, loading, error
+- Main state lives in `app/(main)/page.tsx`: uploaded image, output image, theme, room type, loading, error
 
 **2. API Integration Pattern**
 
@@ -70,16 +84,16 @@ app/
 
 **3. Component Organization**
 
-- **Page components** (`app/components/page-components.tsx`): UI elements specific to main page (ImageDropzone, UploadedImage, ImageOutput, ActionPanel, ErrorNotification)
-- **Layout components** (sidebar, header): Navigation and shell
-- **Utility components** (selectmenu): Reusable form controls
+- **Layout components**: `AppSidebar` (shadcn/ui Sidebar), `SiteHeader` with sidebar trigger
+- **Design controls**: `DesignControls` with two `Combobox` components for theme/room selection
+- **Image components**: `ImageDropzone`, `UploadedImage`, `OutputImage` in `components/`
+- **UI primitives**: shadcn/ui library in `components/ui/` (Button, Card, Combobox, Sidebar, etc.)
 - All components use TypeScript with proper type definitions in `types/index.ts`
 
 **4. Custom Hooks Pattern**
 
-- `app/hooks/useDropzone.ts`: Implements drag-and-drop file upload functionality
-- Returns `getRootProps`, `getInputProps`, and `isDragActive` (similar to react-dropzone API)
-- Validates file type (JPEG/PNG) and size (max 5MB)
+- `hooks/use-mobile.tsx`: Detects mobile viewport for responsive behavior
+- Validates file type (JPEG/PNG) and size (max 5MB) via constants in `lib/constants.ts`
 
 ### Styling Architecture
 
@@ -93,24 +107,44 @@ app/
 
 **Animation Strategy**
 
-- Framer Motion for component animations (entry/exit transitions, hover effects)
-- Tailwind custom animations for background effects and loading states
-- AnimatePresence for mount/unmount animations (intro screen, error notifications, image swaps)
+- Tailwind CSS animations and transitions for UI effects
+- CSS-based loading states and hover effects
+- `tailwindcss-animate` plugin for additional animation utilities
+
+### UI Component Library (shadcn/ui)
+
+The project uses **shadcn/ui** for consistent, accessible UI components:
+
+- **Sidebar**: `SidebarProvider`, `SidebarInset`, `SidebarTrigger` for responsive navigation
+- **Combobox**: Searchable dropdown built on `cmdk` Command component
+- **Primitives**: Button, Card, Popover, Separator, and other composable UI elements
+- All components in `components/ui/` are customizable and follow Radix UI patterns
+
+**Combobox Pattern** (used for theme/room selection):
+
+```tsx
+<Combobox<DesignTheme>
+  options={DESIGN_THEMES}
+  value={selectedTheme}
+  onValueChange={onThemeChange}
+  placeholder="Select theme..."
+/>
+```
 
 ### Image Processing Flow
 
-1. **Upload**: User drops/selects image → `useDropzone` validates → converts to base64
+1. **Upload**: User drops/selects image → `ImageDropzone` validates → converts to base64
 2. **Submit**: Client sends base64 image + theme + room type to `/api/replicate`
 3. **Processing**: API route calls Replicate model `jagilley/controlnet-hough` with structured prompt
-4. **Display**: Output image URL received and displayed in `ImageOutput` component
+4. **Display**: Output image URL received and displayed in `OutputImage` component
 5. **Download**: Users can download result via `file-saver` library
 
 ### Type System
 
 - TypeScript strict mode enabled (`tsconfig.json`)
 - Path aliases configured: `@/*` maps to project root
-- Shared types in `types/index.ts` (NavItem, ImageAreaProps)
-- Component-specific types defined inline (ErrorNotificationProps, ActionPanelProps, etc.)
+- Shared types in `types/index.ts`: `RoomType`, `DesignTheme`, `NavItem`
+- Constants in `lib/constants.ts`: `ROOM_TYPES`, `DESIGN_THEMES`, `MAX_FILE_SIZE`
 
 ## Code Style & Formatting
 
@@ -129,9 +163,10 @@ app/
 
 ### Responsive Design
 
-- Desktop: Permanent sidebar (lg:pl-72 on main content)
-- Mobile: Header with hamburger menu → slide-out sidebar
-- Sidebar closes on Escape key press
+- **Sidebar**: Uses shadcn/ui `SidebarProvider` with CSS variables (`--sidebar-width`)
+- **Collapsible**: Icon-only mode on smaller screens (`collapsible="icon"`)
+- **Mobile**: `SidebarTrigger` in header toggles sidebar visibility
+- **Layout**: `SidebarInset` handles content spacing automatically
 - Two-column grid for image upload/output on xl screens, stacks on smaller screens
 
 ### Performance Considerations
@@ -147,7 +182,7 @@ When adding new features:
 
 - Keep state in the relevant component (prefer local state over lifting)
 - Use `useCallback` for event handlers to prevent unnecessary re-renders
-- Wrap animations in `<AnimatePresence>` for smooth transitions
+- Use shadcn/ui components from `components/ui/` when possible
 - Follow existing TypeScript patterns (explicit return types for functions)
 - Use Tailwind utilities; avoid inline styles unless dynamically computed
 
@@ -160,10 +195,10 @@ When modifying API routes:
 
 ## Dependencies of Note
 
-- **Next.js 14**: App Router architecture (not Pages Router)
+- **Next.js 16**: App Router architecture with React 19
+- **Tailwind CSS 4**: Latest version with improved performance
 - **Replicate**: AI model execution platform
-- **Framer Motion**: Animation library (declarative animations)
-- **Headless UI**: Accessible UI primitives (used for transitions)
+- **shadcn/ui**: Accessible UI component library built on Radix UI
+- **cmdk**: Command menu component (powers the searchable Combobox)
 - **file-saver**: Client-side file download
-- **react-loader-spinner**: Loading indicators
 - **Vercel Analytics**: Integrated for production metrics
