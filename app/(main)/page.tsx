@@ -9,7 +9,7 @@ import { DesignControls } from "@/components/design-controls";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { CircleAlert } from "lucide-react";
 import type { RoomType, DesignTheme } from "@/types";
 
 export default function HomePage() {
@@ -79,7 +79,7 @@ export default function HomePage() {
     <div className="space-y-6">
       {error && (
         <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
+          <CircleAlert className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>

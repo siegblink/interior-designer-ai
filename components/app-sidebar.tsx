@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Palette, Settings, HelpCircle, Blocks } from "lucide-react";
+import { Home, Palette, Settings, CircleHelp, Blocks } from "lucide-react";
 import Link from "next/link";
 import {
   Sidebar,
@@ -34,7 +34,7 @@ const navItems = [
   },
   {
     title: "Help",
-    icon: HelpCircle,
+    icon: CircleHelp,
     href: "/help",
     disabled: false,
   },
