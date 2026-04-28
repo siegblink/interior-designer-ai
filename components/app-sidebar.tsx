@@ -2,6 +2,7 @@
 
 import { Home, Palette, Settings, CircleHelp, Blocks } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
@@ -45,6 +46,8 @@ type Props = {
 };
 
 export function AppSidebar({ variant }: Props) {
+  const pathname = usePathname();
+
   return (
     <Sidebar collapsible="icon" variant={variant}>
       <SidebarHeader>
@@ -75,6 +78,7 @@ export function AppSidebar({ variant }: Props) {
                     asChild={!item.disabled}
                     disabled={item.disabled}
                     tooltip={item.title}
+                    isActive={pathname === item.href}
                   >
                     <Link href={item.href}>
                       <item.icon />
