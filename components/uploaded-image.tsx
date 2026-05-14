@@ -14,7 +14,7 @@ export function UploadedImage({ src, onRemove }: UploadedImageProps) {
   return (
     <Card className="overflow-hidden">
       <CardContent className="relative p-0">
-        <div className="relative aspect-[4/3]">
+        <div className="relative aspect-4/3">
           <Image
             src={src}
             alt="Uploaded room"
