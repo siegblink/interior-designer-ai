@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { ImageDropzone } from "@/components/image-dropzone";
 import { UploadedImage } from "@/components/uploaded-image";
 import { OutputImage } from "@/components/output-image";
-import { DesignControls } from "@/components/design-controls";
+import { DesignControls, SCALE_DEFAULT } from "@/components/design-controls";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +17,7 @@ export default function HomePage() {
   const [outputImage, setOutputImage] = useState<string | null>(null);
   const [selectedTheme, setSelectedTheme] = useState<DesignTheme>("Modern");
   const [selectedRoom, setSelectedRoom] = useState<RoomType>("Living Room");
+  const [scale, setScale] = useState(SCALE_DEFAULT);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -52,6 +53,7 @@ export default function HomePage() {
           image: uploadedImage,
           theme: selectedTheme,
           room: selectedRoom,
+          scale,
         }),
       });
 
@@ -73,7 +75,7 @@ export default function HomePage() {
     } finally {
       setIsLoading(false);
     }
-  }, [uploadedImage, selectedTheme, selectedRoom, handleError]);
+  }, [uploadedImage, selectedTheme, selectedRoom, scale, handleError]);
 
   return (
     <div className="space-y-6">
@@ -96,8 +98,10 @@ export default function HomePage() {
           <DesignControls
             selectedTheme={selectedTheme}
             selectedRoom={selectedRoom}
+            scale={scale}
             onThemeChange={setSelectedTheme}
             onRoomChange={setSelectedRoom}
+            onScaleChange={setScale}
             onGenerate={handleGenerate}
             isLoading={isLoading}
             canGenerate={!!uploadedImage}

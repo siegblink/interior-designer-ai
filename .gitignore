@@ -21,6 +21,9 @@ ui-improvements-playground.html
 .DS_Store
 *.pem
 
+# claude code
+.claude/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

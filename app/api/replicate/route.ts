@@ -16,6 +16,7 @@ export async function POST(request: Request) {
     const image: string = req.image;
     const theme: DesignTheme = req.theme;
     const room: RoomType = req.room;
+    const scale: number = req.scale ?? 9;
 
     const prompt = buildPrompt(theme, room);
     console.log("Prompt:", prompt);
@@ -39,6 +40,7 @@ export async function POST(request: Request) {
         prompt,
         a_prompt: QUALITY_PROMPT,
         n_prompt: NEGATIVE_PROMPT,
+        scale,
       },
     });
 
