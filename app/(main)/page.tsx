@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { ImageDropzone } from "@/components/image-dropzone";
 import { UploadedImage } from "@/components/uploaded-image";
 import { OutputImage } from "@/components/output-image";
+import { ImageComparison } from "@/components/image-comparison";
 import { DesignControls, SCALE_DEFAULT } from "@/components/design-controls";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
@@ -111,24 +112,28 @@ export default function HomePage() {
 
       <Separator />
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="space-y-3">
-          <h2 className="text-sm font-medium">Original Photo</h2>
-          {uploadedImage ? (
-            <UploadedImage src={uploadedImage} onRemove={handleRemoveImage} />
-          ) : (
-            <ImageDropzone
-              onImageUpload={handleImageUpload}
-              onError={handleError}
-            />
-          )}
-        </div>
+      {outputImage && !isLoading ? (
+        <ImageComparison before={uploadedImage!} after={outputImage} />
+      ) : (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="space-y-3">
+            <h2 className="text-sm font-medium">Original Photo</h2>
+            {uploadedImage ? (
+              <UploadedImage src={uploadedImage} onRemove={handleRemoveImage} />
+            ) : (
+              <ImageDropzone
+                onImageUpload={handleImageUpload}
+                onError={handleError}
+              />
+            )}
+          </div>
 
-        <div className="space-y-3">
-          <h2 className="text-sm font-medium">AI Design</h2>
-          <OutputImage src={outputImage} isLoading={isLoading} />
+          <div className="space-y-3">
+            <h2 className="text-sm font-medium">AI Design</h2>
+            <OutputImage src={outputImage} isLoading={isLoading} />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
