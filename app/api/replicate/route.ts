@@ -1,60 +1,85 @@
 import { NextResponse } from "next/server";
 import Replicate from "replicate";
+import { buildPrompt, QUALITY_PROMPT, NEGATIVE_PROMPT } from "@/lib/prompts";
+import type { DesignTheme, RoomType } from "@/types";
+
+// Stable picsum seeds so the same "mock output" is returned every run.
+const MOCK_OUTPUT = [
+  "https://picsum.photos/seed/interior-edge/800/600",
+  "https://picsum.photos/seed/interior-result/800/600",
+];
 
 export async function POST(request: Request) {
-  // 1. Get request data (in JSON format) from the client
-  const req = await request.json();
+  try {
+    const req = await request.json();
 
-  const image = req.image;
-  const theme = req.theme;
-  const room = req.room;
+    const image: string = req.image;
+    const theme: DesignTheme = req.theme;
+    const room: RoomType = req.room;
 
-  // 2. Initialize the replicate object with our Replicate API token
-  const replicate = new Replicate({
-    auth: process.env.REPLICATE_API_TOKEN as string,
-  });
+    const prompt = buildPrompt(theme, room);
+    console.log("Prompt:", prompt);
 
-  // 3. Set the model that we're about to run
-  const model =
-    "jagilley/controlnet-hough:854e8727697a057c525cdb45ab037f64ecca770a1769cc52287c2e56472a247b";
-
-  // 4. Set the image which is the image we uploaded from the client
-  const input = {
-    image,
-    prompt: `A ${theme} ${room} Editorial Style Photo, Symmetry, Straight On, Modern Living Room, Large Window, Leather, Glass, Metal, Wood Paneling, Neutral Palette, Ikea, Natural Light, Apartment, Afternoon, Serene, Contemporary, 4k`,
-    a_prompt: `best quality, extremely detailed, photo from Pinterest, interior, cinematic photo, ultra-detailed, ultra-realistic, award-winning`,
-  };
-
-  // 5. Run the Replicate's model (to remove background) and get the output image
-  const output = await replicate.run(model, {
-    input,
-  });
-
-  // 6. Check if the output is NULL then return error back to the client
-  if (!output) {
-    console.log("Something went wrong");
-    return NextResponse.json(
-      { error: "Something went wrong" },
-      { status: 500 }
-    );
-  }
-
-  // 7. Convert FileOutput objects to URL strings (Replicate SDK v1.4+ returns FileOutput objects)
-  // If output is already string array (backward compatibility), return as-is
-  const outputUrls = Array.isArray(output)
-    ? output.map((item) => (typeof item === "string" ? item : item.toString()))
-    : [];
-
-  // 8. Otherwise, we show output in the console (server-side)
-  //  and return the output back to the client
-  console.log("Output", outputUrls);
-
-  return NextResponse.json(
-    {
-      output: outputUrls,
-    },
-    {
-      status: 201,
+    if (process.env.REPLICATE_MOCK === "true") {
+      console.log("[mock] Skipping Replicate call, returning mock output.");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      return NextResponse.json({ output: MOCK_OUTPUT }, { status: 201 });
     }
-  );
+
+    const replicate = new Replicate({
+      auth: process.env.REPLICATE_API_TOKEN as string,
+    });
+
+    const model =
+      "jagilley/controlnet-hough:854e8727697a057c525cdb45ab037f64ecca770a1769cc52287c2e56472a247b";
+
+    const output = await replicate.run(model, {
+      input: {
+        image,
+        prompt,
+        a_prompt: QUALITY_PROMPT,
+        n_prompt: NEGATIVE_PROMPT,
+      },
+    });
+
+    if (!output) {
+      return NextResponse.json(
+        { error: "No output received from the model." },
+        { status: 500 }
+      );
+    }
+
+    const outputUrls = Array.isArray(output)
+      ? output.map((item) =>
+          typeof item === "string" ? item : item.toString()
+        )
+      : [];
+
+    console.log("Output:", outputUrls);
+    return NextResponse.json({ output: outputUrls }, { status: 201 });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "An error occurred";
+    console.error("Replicate API error:", message);
+
+    if (message.includes("401") || message.includes("Unauthenticated")) {
+      return NextResponse.json(
+        { error: "Invalid or missing Replicate API token." },
+        { status: 401 }
+      );
+    }
+    if (message.includes("402") || message.includes("Payment")) {
+      return NextResponse.json(
+        { error: "Replicate account has insufficient credits." },
+        { status: 402 }
+      );
+    }
+    if (message.includes("429") || message.includes("rate limit")) {
+      return NextResponse.json(
+        { error: "Rate limit reached. Please wait a moment and try again." },
+        { status: 429 }
+      );
+    }
+
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }

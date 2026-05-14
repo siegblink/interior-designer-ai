@@ -57,6 +57,7 @@ export function OutputImage({ src, isLoading }: OutputImageProps) {
             fill
             src={src}
             alt="AI generated design"
+            sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-cover"
           />
         </div>

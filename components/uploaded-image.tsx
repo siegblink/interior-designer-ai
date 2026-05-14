@@ -15,7 +15,13 @@ export function UploadedImage({ src, onRemove }: UploadedImageProps) {
     <Card className="overflow-hidden">
       <CardContent className="relative p-0">
         <div className="relative aspect-[4/3]">
-          <Image src={src} alt="Uploaded room" fill className="object-cover" />
+          <Image
+            src={src}
+            alt="Uploaded room"
+            fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="object-cover"
+          />
         </div>
         <Button
           variant="destructive"
