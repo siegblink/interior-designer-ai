@@ -5,17 +5,28 @@ import {
   ReactCompareSliderImage,
   ReactCompareSliderHandle,
 } from "react-compare-slider";
-import { Download } from "lucide-react";
+import { Download, RefreshCw } from "lucide-react";
 import { saveAs } from "file-saver";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ImageComparisonProps {
   before: string;
   after: string;
+  onRegenerate: () => void;
 }
 
-export function ImageComparison({ before, after }: ImageComparisonProps) {
+export function ImageComparison({
+  before,
+  after,
+  onRegenerate,
+}: ImageComparisonProps) {
   const handleDownload = () => {
     saveAs(after, "interior-design.png");
   };
@@ -59,15 +70,36 @@ export function ImageComparison({ before, after }: ImageComparisonProps) {
             className="h-[65vh] w-full"
           />
 
-          <Button
-            variant="secondary"
-            size="icon"
-            className="absolute top-2 right-2 z-10"
-            onClick={handleDownload}
-          >
-            <Download className="h-4 w-4" />
-            <span className="sr-only">Download image</span>
-          </Button>
+          <TooltipProvider>
+            <div className="absolute top-2 right-2 z-10 flex gap-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    onClick={onRegenerate}
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                    <span className="sr-only">Try again</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Try again</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    onClick={handleDownload}
+                  >
+                    <Download className="h-4 w-4" />
+                    <span className="sr-only">Download image</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Download image</TooltipContent>
+              </Tooltip>
+            </div>
+          </TooltipProvider>
         </CardContent>
       </Card>
     </div>

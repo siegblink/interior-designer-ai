@@ -113,7 +113,11 @@ export default function HomePage() {
       <Separator />
 
       {outputImage && !isLoading ? (
-        <ImageComparison before={uploadedImage!} after={outputImage} />
+        <ImageComparison
+          before={uploadedImage!}
+          after={outputImage}
+          onRegenerate={handleGenerate}
+        />
       ) : (
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="space-y-3">
