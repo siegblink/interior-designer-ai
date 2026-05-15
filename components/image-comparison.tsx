@@ -1,12 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import {
   ReactCompareSlider,
   ReactCompareSliderImage,
   ReactCompareSliderHandle,
 } from "react-compare-slider";
-import { Download, RefreshCw } from "lucide-react";
+import {
+  Bookmark,
+  BookmarkCheck,
+  Download,
+  Loader2,
+  RefreshCw,
+} from "lucide-react";
 import { saveAs } from "file-saver";
+import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,20 +23,51 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import type { DesignTheme, RoomType } from "@/types";
 
 interface ImageComparisonProps {
   before: string;
   after: string;
+  theme: DesignTheme;
+  room: RoomType;
   onRegenerate: () => void;
 }
 
 export function ImageComparison({
   before,
   after,
+  theme,
+  room,
   onRegenerate,
 }: ImageComparisonProps) {
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+
   const handleDownload = () => {
     saveAs(after, "interior-design.png");
+  };
+
+  const handleSaveToGallery = async () => {
+    setIsSaving(true);
+    try {
+      const response = await fetch("/api/gallery", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageUrl: after, theme, room }),
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to save to gallery");
+      }
+      setIsSaved(true);
+      toast.success("Saved to gallery!");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to save to gallery"
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -97,6 +136,26 @@ export function ImageComparison({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Download image</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    onClick={handleSaveToGallery}
+                    disabled={isSaving || isSaved}
+                  >
+                    {isSaving ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : isSaved ? (
+                      <BookmarkCheck className="h-4 w-4" />
+                    ) : (
+                      <Bookmark className="h-4 w-4" />
+                    )}
+                    <span className="sr-only">Save to gallery</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Save to gallery</TooltipContent>
               </Tooltip>
             </div>
           </TooltipProvider>

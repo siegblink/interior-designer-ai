@@ -116,6 +116,8 @@ export default function HomePage() {
         <ImageComparison
           before={uploadedImage!}
           after={outputImage}
+          theme={selectedTheme}
+          room={selectedRoom}
           onRegenerate={handleGenerate}
         />
       ) : (
