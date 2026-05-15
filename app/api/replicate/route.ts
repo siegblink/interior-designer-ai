@@ -3,12 +3,6 @@ import Replicate from "replicate";
 import { buildPrompt, QUALITY_PROMPT, NEGATIVE_PROMPT } from "@/lib/prompts";
 import type { DesignTheme, RoomType } from "@/types";
 
-// Stable picsum seeds so the same "mock output" is returned every run.
-const MOCK_OUTPUT = [
-  "https://picsum.photos/seed/interior-edge/800/600",
-  "https://picsum.photos/seed/interior-result/800/600",
-];
-
 export async function POST(request: Request) {
   try {
     const req = await request.json();
@@ -20,12 +14,6 @@ export async function POST(request: Request) {
 
     const prompt = buildPrompt(theme, room);
     console.log("Prompt:", prompt);
-
-    if (process.env.REPLICATE_MOCK === "true") {
-      console.log("[mock] Skipping Replicate call, returning mock output.");
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      return NextResponse.json({ output: MOCK_OUTPUT }, { status: 201 });
-    }
 
     const replicate = new Replicate({
       auth: process.env.REPLICATE_API_TOKEN as string,
