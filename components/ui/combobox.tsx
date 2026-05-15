@@ -43,12 +43,12 @@ export function Combobox<T extends string>({
   const [width, setWidth] = useState<number>();
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const handleOpenChange = (isOpen: boolean) => {
+  function handleOpenChange(isOpen: boolean) {
     if (isOpen && triggerRef.current) {
       setWidth(triggerRef.current.offsetWidth);
     }
     setOpen(isOpen);
-  };
+  }
 
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>

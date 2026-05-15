@@ -37,7 +37,7 @@ export function GalleryGrid({ initialDesigns }: GalleryGridProps) {
   const [designs, setDesigns] = useState(initialDesigns);
   const [deletingUrl, setDeletingUrl] = useState<string | null>(null);
 
-  const handleDelete = async (url: string) => {
+  async function handleDelete(url: string) {
     setDeletingUrl(url);
     setDesigns((prev) => prev.filter((d) => d.url !== url));
 
@@ -58,11 +58,11 @@ export function GalleryGrid({ initialDesigns }: GalleryGridProps) {
     } finally {
       setDeletingUrl(null);
     }
-  };
+  }
 
   if (designs.length === 0) {
     return (
-      <div className="flex min-h-[400px] flex-col items-center justify-center gap-3 text-center">
+      <div className="flex min-h-100 flex-col items-center justify-center gap-3 text-center">
         <p className="text-muted-foreground text-sm">
           No saved designs yet. Generate a design and save it to see it here.
         </p>

@@ -11,13 +11,13 @@ interface ImageDropzoneProps {
 }
 
 export function ImageDropzone({ onImageUpload, onError }: ImageDropzoneProps) {
-  const handleDrop = (file: File) => {
+  function handleDrop(file: File) {
     const reader = new FileReader();
     reader.onloadend = () => {
       onImageUpload(reader.result as string);
     };
     reader.readAsDataURL(file);
-  };
+  }
 
   const { isDragActive, getRootProps, getInputProps } = useDropzone({
     onDrop: handleDrop,

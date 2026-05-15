@@ -43,11 +43,11 @@ export function ImageComparison({
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
 
-  const handleDownload = () => {
+  function handleDownload() {
     saveAs(after, "interior-design.png");
-  };
+  }
 
-  const handleSaveToGallery = async () => {
+  async function handleSaveToGallery() {
     setIsSaving(true);
     try {
       const response = await fetch("/api/gallery", {
@@ -68,7 +68,7 @@ export function ImageComparison({
     } finally {
       setIsSaving(false);
     }
-  };
+  }
 
   return (
     <div className="space-y-3">

@@ -53,11 +53,11 @@ export function OutputImage({ src, isLoading }: OutputImageProps) {
     };
   }, [isLoading]);
 
-  const handleDownload = () => {
+  function handleDownload() {
     if (src) {
       saveAs(src, "interior-design.png");
     }
-  };
+  }
 
   if (isLoading) {
     return (
