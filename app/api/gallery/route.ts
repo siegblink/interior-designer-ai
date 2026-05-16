@@ -1,4 +1,5 @@
 import { put, list, del } from "@vercel/blob";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 function encodePathname(theme: string, room: string): string {
@@ -75,6 +76,13 @@ export async function GET() {
 }
 
 export async function DELETE(request: Request) {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("admin_session");
+  const adminSecret = process.env.GALLERY_ADMIN_SECRET;
+  if (!adminSecret || session?.value !== adminSecret) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const { url } = await request.json();
     await del(url);
