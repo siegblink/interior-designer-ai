@@ -6,19 +6,24 @@ import { ImageDropzone } from "@/components/image-dropzone";
 import { UploadedImage } from "@/components/uploaded-image";
 import { OutputImage } from "@/components/output-image";
 import { ImageComparison } from "@/components/image-comparison";
-import { DesignControls, SCALE_DEFAULT } from "@/components/design-controls";
+import { DesignControls } from "@/components/design-controls";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CircleAlert } from "lucide-react";
+import { useSettings } from "@/hooks/use-settings";
 import type { RoomType, DesignTheme } from "@/types";
 
 export default function HomePage() {
+  const [settings, setSettings] = useSettings();
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [outputImage, setOutputImage] = useState<string | null>(null);
-  const [selectedTheme, setSelectedTheme] = useState<DesignTheme>("Modern");
-  const [selectedRoom, setSelectedRoom] = useState<RoomType>("Living Room");
-  const [scale, setScale] = useState(SCALE_DEFAULT);
+  const selectedTheme = settings.theme;
+  const selectedRoom = settings.room;
+  const scale = settings.scale;
+  const setSelectedTheme = (theme: DesignTheme) => setSettings({ theme });
+  const setSelectedRoom = (room: RoomType) => setSettings({ room });
+  const setScale = (scale: number) => setSettings({ scale });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
