@@ -112,20 +112,19 @@ export default function HelpPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ol className="flex flex-col gap-6">
+          <ol className="flex flex-col">
             {STEPS.map((step, index) => {
               const Icon = step.icon;
+              const isLast = index === STEPS.length - 1;
               return (
                 <li key={step.title} className="flex gap-4">
                   <div className="flex flex-col items-center">
                     <div className="bg-primary text-primary-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
                       {index + 1}
                     </div>
-                    {index < STEPS.length - 1 && (
-                      <div className="bg-border mt-2 w-px flex-1" />
-                    )}
+                    {!isLast && <div className="bg-border w-px flex-1" />}
                   </div>
-                  <div className="pb-6">
+                  <div className={isLast ? "pb-0" : "pb-8"}>
                     <div className="flex items-center gap-2">
                       <Icon className="text-muted-foreground h-4 w-4" />
                       <span className="text-sm font-medium">{step.title}</span>
