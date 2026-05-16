@@ -1,0 +1,16 @@
+{
+  "name": "Interior Designer AI",
+  "short_name": "Interior AI",
+  "description": "Transform your space with AI-powered interior design in seconds.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/next.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
