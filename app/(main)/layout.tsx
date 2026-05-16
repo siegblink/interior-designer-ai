@@ -1,6 +1,7 @@
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import SiteHeader from "@/components/site-header";
+import { GithubCorner } from "@/components/github-corner";
 
 type Props = {
   children: React.ReactNode;
@@ -14,6 +15,7 @@ export default function MainLayout({ children }: Props) {
 
   return (
     <SidebarProvider style={style}>
+      <GithubCorner />
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
