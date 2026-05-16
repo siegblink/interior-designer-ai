@@ -1,10 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Lock } from "lucide-react";
+import { ArrowLeft, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
@@ -46,6 +47,13 @@ export function AdminSignIn() {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
+      <Button variant="ghost" size="sm" className="fixed top-4 left-4" asChild>
+        <Link href="/">
+          <ArrowLeft className="h-4 w-4" />
+          Back to home
+        </Link>
+      </Button>
+
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <div className="bg-muted mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full">
