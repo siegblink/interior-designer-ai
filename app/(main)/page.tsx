@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { ImageDropzone } from "@/components/image-dropzone";
 import { UploadedImage } from "@/components/uploaded-image";
@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CircleAlert } from "lucide-react";
 import { useSettings } from "@/hooks/use-settings";
+import { useDesign } from "@/contexts/design-context";
 import type { RoomType, DesignTheme } from "@/types";
 
 export default function HomePage() {
@@ -26,6 +27,11 @@ export default function HomePage() {
   const setScale = (scale: number) => setSettings({ scale });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { setOutputImage: setContextOutputImage } = useDesign();
+
+  useEffect(() => {
+    setContextOutputImage(outputImage);
+  }, [outputImage, setContextOutputImage]);
 
   const handleImageUpload = useCallback((base64: string) => {
     setUploadedImage(base64);

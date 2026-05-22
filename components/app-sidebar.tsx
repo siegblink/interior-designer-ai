@@ -1,8 +1,17 @@
 "use client";
 
-import { Home, Palette, Settings, CircleHelp, Blocks } from "lucide-react";
+import { useState } from "react";
+import {
+  Home,
+  Palette,
+  Settings,
+  CircleHelp,
+  Blocks,
+  Download,
+} from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { saveAs } from "file-saver";
 import {
   Sidebar,
   SidebarContent,
@@ -13,32 +22,22 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { useDesign } from "@/contexts/design-context";
 
 const navItems = [
-  {
-    title: "Design",
-    icon: Home,
-    href: "/",
-    disabled: false,
-  },
-  {
-    title: "Gallery",
-    icon: Blocks,
-    href: "/gallery",
-    disabled: false,
-  },
-  {
-    title: "Settings",
-    icon: Settings,
-    href: "/settings",
-    disabled: false,
-  },
-  {
-    title: "Help",
-    icon: CircleHelp,
-    href: "/help",
-    disabled: false,
-  },
+  { title: "Design", icon: Home, href: "/", disabled: false },
+  { title: "Gallery", icon: Blocks, href: "/gallery", disabled: false },
+  { title: "Settings", icon: Settings, href: "/settings", disabled: false },
+  { title: "Help", icon: CircleHelp, href: "/help", disabled: false },
 ];
 
 type Props = {
@@ -47,6 +46,33 @@ type Props = {
 
 export function AppSidebar({ variant }: Props) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { outputImage, setOutputImage } = useDesign();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
+
+  function handleNavClick(e: React.MouseEvent, href: string) {
+    if (outputImage && pathname !== href) {
+      e.preventDefault();
+      setPendingHref(href);
+      setDialogOpen(true);
+    }
+  }
+
+  function handleDownload() {
+    if (outputImage) {
+      saveAs(outputImage, "interior-design.png");
+    }
+  }
+
+  function handleContinue() {
+    if (pendingHref) {
+      router.push(pendingHref);
+    }
+    setOutputImage(null);
+    setDialogOpen(false);
+    setPendingHref(null);
+  }
 
   return (
     <Sidebar collapsible="icon" variant={variant}>
@@ -80,7 +106,10 @@ export function AppSidebar({ variant }: Props) {
                     tooltip={item.title}
                     isActive={pathname === item.href}
                   >
-                    <Link href={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={(e) => handleNavClick(e, item.href)}
+                    >
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>
@@ -91,6 +120,28 @@ export function AppSidebar({ variant }: Props) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unsaved Design</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your generated design will no longer be accessible once you leave
+              this page. Download it to keep a copy before continuing.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2">
+            <Button variant="ghost" onClick={() => setDialogOpen(false)}>
+              Stay
+            </Button>
+            <Button variant="outline" onClick={handleDownload}>
+              <Download className="h-4 w-4" />
+              Download
+            </Button>
+            <Button onClick={handleContinue}>Leave anyway</Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Sidebar>
   );
 }
