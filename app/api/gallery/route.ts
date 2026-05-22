@@ -2,6 +2,21 @@ import { put, list, del } from "@vercel/blob";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+const ALLOWED_IMAGE_HOSTS = ["replicate.delivery"];
+
+function parseAllowedImageUrl(rawUrl: string): URL | null {
+  try {
+    const url = new URL(rawUrl);
+    if (url.protocol !== "https:") return null;
+    const hostAllowed = ALLOWED_IMAGE_HOSTS.some(
+      (host) => url.hostname === host || url.hostname.endsWith(`.${host}`)
+    );
+    return hostAllowed ? url : null;
+  } catch {
+    return null;
+  }
+}
+
 function encodePathname(theme: string, room: string): string {
   const id = Date.now();
   return `designs/${id}_${encodeURIComponent(theme)}_${encodeURIComponent(room)}.png`;
@@ -21,7 +36,15 @@ export async function POST(request: Request) {
   try {
     const { imageUrl, theme, room } = await request.json();
 
-    const imageResponse = await fetch(imageUrl);
+    const parsedImageUrl = parseAllowedImageUrl(imageUrl);
+    if (!parsedImageUrl) {
+      return NextResponse.json(
+        { error: "Image URL is not from a trusted source." },
+        { status: 400 }
+      );
+    }
+
+    const imageResponse = await fetch(parsedImageUrl.href);
     if (!imageResponse.ok) {
       return NextResponse.json(
         { error: "Failed to fetch image from source URL." },
