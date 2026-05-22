@@ -37,39 +37,49 @@ powershell -c "irm bun.sh/install.ps1 | iex"
 
 For more installation options, visit [https://bun.sh/docs/installation](https://bun.sh/docs/installation)
 
-### 3. Install the project dependencies
+### 3. Install portless globally
+
+**portless** provides a local HTTPS tunnel so the app runs at `https://interior-design.localhost`.
+
+```bash
+bun install -g portless
+```
+
+> On first run, portless will request your password to bind port 443 and install a local CA certificate so browsers trust the HTTPS connection.
+
+### 4. Install the project dependencies
 
 Go to the project's directory
 
 - Type `cd interior-designer-ai`
 - Then, `bun install`
 
-### 4. Create an account at [replicate](https://replicate.com/)
+### 5. Create an account at [replicate](https://replicate.com/)
 
 ![create-account-in-replicate](public/create-account-in-replicate.png)
 
-### 5. Go to the _API tokens_ page within your replicate account
+### 6. Go to the _API tokens_ page within your replicate account
 
 ![go-to-api-tokens](public/go-to-api-tokens.png)
 
-### 6. Create your API token and copy it
+### 7. Create your API token and copy it
 
 ![create-api-token](public/create-api-token.png)
 
-### 7. Rename the `.env.example` file to `.env.local`
+### 8. Rename the `.env.example` file to `.env.local`
 
-### 8. In `.env.local`, replace the placeholder _your_api_token_ with your API token
+### 9. In `.env.local`, replace the placeholder _your_api_token_ with your API token
 
 ```
 # Replace 'your-api-token' with your own API token from replicate
 REPLICATE_API_TOKEN=your-api-token
 ```
 
-### 9. Run the project
+### 10. Run the project
 
 Back in your Terminal in the project directory, type `bun dev`
 
-### 10. See the running application in your browser at `localhost:3000`
+### 11. See the running application in your browser at `https://interior-design.localhost`
 
 ![see-running-app](public/see-running-app.png)
 
