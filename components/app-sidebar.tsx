@@ -21,6 +21,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   AlertDialog,
@@ -48,6 +49,7 @@ export function AppSidebar({ variant }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const { outputImage, setOutputImage } = useDesign();
+  const { setOpenMobile } = useSidebar();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [pendingHref, setPendingHref] = useState<string | null>(null);
 
@@ -56,6 +58,8 @@ export function AppSidebar({ variant }: Props) {
       e.preventDefault();
       setPendingHref(href);
       setDialogOpen(true);
+    } else {
+      setOpenMobile(false);
     }
   }
 
@@ -70,6 +74,7 @@ export function AppSidebar({ variant }: Props) {
       router.push(pendingHref);
     }
     setOutputImage(null);
+    setOpenMobile(false);
     setDialogOpen(false);
     setPendingHref(null);
   }
