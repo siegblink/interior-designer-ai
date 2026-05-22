@@ -44,7 +44,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // lgtm[js/request-forgery] -- URL is validated against ALLOWED_IMAGE_HOSTS allowlist above
     const imageResponse = await fetch(parsedImageUrl.href);
     if (!imageResponse.ok) {
       return NextResponse.json(
