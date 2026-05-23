@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://interior-designer-ai.vercel.app/app-screenshot.png",
+        url: "https://interior-designer-ai.vercel.app/og-image.png",
         width: 1200,
         height: 630,
         alt: "Interior Designer AI - Transform your space instantly",
@@ -44,26 +44,58 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Interior Designer AI",
     description: "Transform your space with AI-powered interior design",
-    images: ["https://interior-designer-ai.vercel.app/app-screenshot.png"],
+    images: ["https://interior-designer-ai.vercel.app/og-image.png"],
   },
   manifest: "/manifest.json",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/icon.png", sizes: "64x64", type: "image/png" },
+    ],
     apple: "/apple-touch-icon.png",
   },
 };
 
 export const viewport = {
-  themeColor: "#ffffff",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#18181b" },
+  ],
 };
 
 type RootLayoutProps = {
   children: React.ReactNode;
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Interior Designer AI",
+  description:
+    "Transform your space with AI-powered interior design in seconds. Upload a photo of any room and instantly see it reimagined in dozens of design styles.",
+  url: "https://interior-designer-ai.vercel.app/",
+  applicationCategory: "DesignApplication",
+  operatingSystem: "Web",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+  creator: {
+    "@type": "Organization",
+    name: "Interior Designer AI",
+  },
+};
+
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className={`${inter.className} min-h-screen antialiased`}>
         <ThemeProvider
           attribute="class"
