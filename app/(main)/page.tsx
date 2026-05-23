@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CircleAlert } from "lucide-react";
 import { useSettings } from "@/hooks/use-settings";
 import { useDesign } from "@/contexts/design-context";
+import { SeoContent } from "@/components/seo-content";
 import type { RoomType, DesignTheme } from "@/types";
 
 export default function HomePage() {
@@ -151,6 +152,8 @@ export default function HomePage() {
           </div>
         </div>
       )}
+
+      <SeoContent />
     </div>
   );
 }
