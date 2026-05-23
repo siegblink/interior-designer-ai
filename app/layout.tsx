@@ -55,14 +55,6 @@ export const metadata: Metadata = {
     description: "Transform your space with AI-powered interior design",
     images: ["https://interior-designer-ai.vercel.app/og-image.png"],
   },
-  manifest: "/manifest.json",
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "32x32" },
-      { url: "/icon.png", sizes: "64x64", type: "image/png" },
-    ],
-    apple: "/apple-touch-icon.png",
-  },
 };
 
 export const viewport = {
