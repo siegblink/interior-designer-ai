@@ -3,9 +3,9 @@
   "version": "1.0.2",
   "private": true,
   "scripts": {
-    "dev": "portless interior-design bun --bun next dev",
+    "dev": "portless interior-design next dev",
     "build": "next build",
-    "start": "bun --bun next start",
+    "start": "next start",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt --write .",
