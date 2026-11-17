@@ -1,11 +1,11 @@
 import { GalleryGrid } from "@/components/gallery-grid";
-import { listDesigns, type Design } from "@/lib/gallery";
+import { listDesignsCached, type Design } from "@/lib/gallery";
 
 export const dynamic = "force-dynamic";
 
 async function fetchDesigns(): Promise<Design[]> {
   try {
-    return await listDesigns();
+    return await listDesignsCached();
   } catch {
     return [];
   }

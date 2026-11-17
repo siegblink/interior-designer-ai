@@ -4,7 +4,11 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ADMIN_SESSION_COOKIE, isAdminSession } from "@/lib/admin-session";
 import { DESIGN_THEMES, ROOM_TYPES } from "@/lib/constants";
-import { DESIGNS_PREFIX, encodeDesignPathname } from "@/lib/gallery";
+import {
+  DESIGNS_PREFIX,
+  encodeDesignPathname,
+  revalidateDesigns,
+} from "@/lib/gallery";
 import {
   GALLERY_SAVE_PER_CLIENT,
   gallerySaveBudget,
@@ -194,6 +198,7 @@ export async function POST(request: Request) {
       access: "public",
       contentType,
     });
+    revalidateDesigns();
 
     return NextResponse.json({ url: blob.url }, { status: 201 });
   } catch (err) {
@@ -221,6 +226,7 @@ export async function DELETE(request: Request) {
 
   try {
     await del(designUrl.href);
+    revalidateDesigns();
     return NextResponse.json({ success: true });
   } catch (err) {
     const message =
