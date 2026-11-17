@@ -16,10 +16,3 @@ export type DesignTheme =
   | "Traditional"
   | "Coastal"
   | "Mid-Century Modern";
-
-export interface NavItem {
-  title: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  disabled?: boolean;
-}
