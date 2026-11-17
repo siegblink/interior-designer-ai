@@ -56,8 +56,8 @@ export function ImageComparison({
         body: JSON.stringify({ imageUrl: after, theme, room }),
       });
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to save to gallery");
+        const data = await response.json().catch(() => null);
+        throw new Error(data?.error || "Failed to save to gallery");
       }
       setIsSaved(true);
       toast.success("Saved to gallery!");
@@ -97,13 +97,18 @@ export function ImageComparison({
             }
             handle={
               <ReactCompareSliderHandle
-                buttonStyle={{
-                  backdropFilter: "blur(4px)",
-                  background: "hsl(var(--background) / 0.8)",
-                  border: "2px solid hsl(var(--border))",
-                  color: "hsl(var(--foreground))",
-                }}
-                linesStyle={{ color: "hsl(var(--border))" }}
+                buttonStyle={
+                  {
+                    // Same frosted surface as the Original / AI Design labels.
+                    // The library draws the arrows in --rcs-handle-color
+                    // (white by default), not in the text colour.
+                    "--rcs-handle-color": "var(--foreground)",
+                    backgroundColor:
+                      "color-mix(in oklab, var(--background) 80%, transparent)",
+                    border:
+                      "2px solid color-mix(in oklab, var(--foreground) 30%, transparent)",
+                  } as React.CSSProperties
+                }
               />
             }
             className="h-[65vh] w-full"

@@ -1,11 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
-import { Download, Sparkles } from "lucide-react";
-import { saveAs } from "file-saver";
+import { Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const STAGES = [
@@ -24,11 +21,15 @@ function formatElapsed(seconds: number): string {
 }
 
 interface OutputImageProps {
-  src: string | null;
   isLoading: boolean;
 }
 
-export function OutputImage({ src, isLoading }: OutputImageProps) {
+/**
+ * The "AI Design" panel before a result exists: a placeholder, or progress
+ * while a design is being generated. The result itself is shown by
+ * ImageComparison.
+ */
+export function OutputImage({ isLoading }: OutputImageProps) {
   const [elapsed, setElapsed] = useState(0);
   const [stageIndex, setStageIndex] = useState(0);
 
@@ -53,12 +54,6 @@ export function OutputImage({ src, isLoading }: OutputImageProps) {
     };
   }, [isLoading]);
 
-  function handleDownload() {
-    if (src) {
-      saveAs(src, "interior-design.png");
-    }
-  }
-
   if (isLoading) {
     return (
       <Card>
@@ -80,39 +75,12 @@ export function OutputImage({ src, isLoading }: OutputImageProps) {
     );
   }
 
-  if (!src) {
-    return (
-      <Card className="border-muted-foreground/25 hover:border-muted-foreground/50 border-2 border-dashed">
-        <CardContent className="flex aspect-4/3 items-center justify-center p-8">
-          <p className="text-muted-foreground text-center">
-            Your AI-generated design will appear here
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="relative p-0">
-        <div className="relative aspect-4/3">
-          <Image
-            fill
-            src={src}
-            alt="AI generated design"
-            sizes="(max-width: 1024px) 100vw, 50vw"
-            className="object-cover"
-          />
-        </div>
-        <Button
-          variant="secondary"
-          size="icon"
-          className="absolute top-2 right-2"
-          onClick={handleDownload}
-        >
-          <Download className="h-4 w-4" />
-          <span className="sr-only">Download image</span>
-        </Button>
+    <Card className="border-muted-foreground/25 hover:border-muted-foreground/50 border-2 border-dashed">
+      <CardContent className="flex aspect-4/3 items-center justify-center p-8">
+        <p className="text-muted-foreground text-center">
+          Your AI-generated design will appear here
+        </p>
       </CardContent>
     </Card>
   );

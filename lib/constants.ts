@@ -31,5 +31,27 @@ export const MAX_IMAGE_DATA_URL_LENGTH = 4_000_000;
 
 // The model's guidance scale ("style strength"): default and accepted bounds.
 export const SCALE_DEFAULT = 9;
+export const SCALE_PRESETS = [
+  {
+    value: 4,
+    label: "Faithful",
+    description: "Keeps your room's layout intact",
+  },
+  {
+    value: 9,
+    label: "Balanced",
+    description: "A blend of your space and the style",
+  },
+  {
+    value: 14,
+    label: "Creative",
+    description: "More AI freedom with the design",
+  },
+  {
+    value: 19,
+    label: "Bold",
+    description: "Full AI reimagining of your space",
+  },
+] as const;
 export const SCALE_MIN = 0.1;
 export const SCALE_MAX = 30;

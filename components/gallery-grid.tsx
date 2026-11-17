@@ -1,13 +1,7 @@
 import Image from "next/image";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-interface Design {
-  url: string;
-  theme: string;
-  room: string;
-  createdAt: string;
-}
+import type { Design } from "@/lib/gallery";
 
 interface GalleryGridProps {
   initialDesigns: Design[];
@@ -44,7 +38,7 @@ export function GalleryGrid({ initialDesigns }: GalleryGridProps) {
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
                 className="object-cover"
-                priority={i < 3}
+                preload={i < 3}
               />
             </div>
           </CardContent>

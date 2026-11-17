@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { ImageDropzone } from "@/components/image-dropzone";
 import { UploadedImage } from "@/components/uploaded-image";
@@ -13,12 +13,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CircleAlert } from "lucide-react";
 import { useSettings } from "@/hooks/use-settings";
 import { useDesign } from "@/contexts/design-context";
+import { generationErrorMessage, pickDesignImage } from "@/lib/generation";
 import type { RoomType, DesignTheme } from "@/types";
+
+interface DesignOutput {
+  image: string;
+  theme: DesignTheme;
+  room: RoomType;
+}
 
 export default function HomePage() {
   const [settings, setSettings] = useSettings();
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [outputImage, setOutputImage] = useState<string | null>(null);
+  // The design on screen, with the theme and room it was generated for. Saving
+  // must use these, not the controls, which may have changed since.
+  const [output, setOutput] = useState<DesignOutput | null>(null);
+  const outputImage = output?.image ?? null;
   const selectedTheme = settings.theme;
   const selectedRoom = settings.room;
   const scale = settings.scale;
@@ -28,20 +38,26 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { setOutputImage: setContextOutputImage } = useDesign();
+  const requestRef = useRef<AbortController | null>(null);
+
+  // Stop waiting for a generation once this page is gone.
+  useEffect(() => () => requestRef.current?.abort(), []);
 
   useEffect(() => {
     setContextOutputImage(outputImage);
+    // Disarm the sidebar navigation guard once this page is gone.
+    return () => setContextOutputImage(null);
   }, [outputImage, setContextOutputImage]);
 
   const handleImageUpload = useCallback((base64: string) => {
     setUploadedImage(base64);
-    setOutputImage(null);
+    setOutput(null);
     setError(null);
   }, []);
 
   const handleRemoveImage = useCallback(() => {
     setUploadedImage(null);
-    setOutputImage(null);
+    setOutput(null);
     setError(null);
   }, []);
 
@@ -53,13 +69,18 @@ export default function HomePage() {
   const handleGenerate = useCallback(async () => {
     if (!uploadedImage) return;
 
+    const request = new AbortController();
+    requestRef.current?.abort();
+    requestRef.current = request;
+
     setIsLoading(true);
     setError(null);
-    setOutputImage(null);
+    setOutput(null);
 
     try {
       const response = await fetch("/api/replicate", {
         method: "POST",
+        signal: request.signal,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           image: uploadedImage,
@@ -69,23 +90,26 @@ export default function HomePage() {
         }),
       });
 
-      const data = await response.json();
+      // Platform errors (413 body too large, 504 timeout) are not JSON.
+      const data = await response.json().catch(() => null);
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to generate design");
+        throw new Error(generationErrorMessage(response.status, data));
       }
 
-      if (data.output && data.output.length > 0) {
-        // The Replicate API for this model returns two images: the control map and the final generated image.
-        // We want the final image, which is the second one in the array.
-        setOutputImage(data.output[1] || data.output[0]);
+      const image = pickDesignImage(data?.output);
+      if (image) {
+        setOutput({ image, theme: selectedTheme, room: selectedRoom });
         toast.success("Design generated successfully!");
+      } else {
+        handleError("The model returned no image. Please try again.");
       }
     } catch (err) {
+      if (request.signal.aborted) return;
       const message = err instanceof Error ? err.message : "An error occurred";
       handleError(message);
     } finally {
-      setIsLoading(false);
+      if (!request.signal.aborted) setIsLoading(false);
     }
   }, [uploadedImage, selectedTheme, selectedRoom, scale, handleError]);
 
@@ -123,12 +147,12 @@ export default function HomePage() {
 
       <Separator />
 
-      {outputImage && !isLoading ? (
+      {output && uploadedImage && !isLoading ? (
         <ImageComparison
-          before={uploadedImage!}
-          after={outputImage}
-          theme={selectedTheme}
-          room={selectedRoom}
+          before={uploadedImage}
+          after={output.image}
+          theme={output.theme}
+          room={output.room}
           onRegenerate={handleGenerate}
         />
       ) : (
@@ -136,7 +160,11 @@ export default function HomePage() {
           <div className="space-y-3">
             <h2 className="text-sm font-medium">Original Photo</h2>
             {uploadedImage ? (
-              <UploadedImage src={uploadedImage} onRemove={handleRemoveImage} />
+              <UploadedImage
+                src={uploadedImage}
+                onRemove={handleRemoveImage}
+                disabled={isLoading}
+              />
             ) : (
               <ImageDropzone
                 onImageUpload={handleImageUpload}
@@ -147,7 +175,7 @@ export default function HomePage() {
 
           <div className="space-y-3">
             <h2 className="text-sm font-medium">AI Design</h2>
-            <OutputImage src={outputImage} isLoading={isLoading} />
+            <OutputImage isLoading={isLoading} />
           </div>
         </div>
       )}

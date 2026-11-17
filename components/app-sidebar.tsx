@@ -52,11 +52,15 @@ export function AppSidebar({ variant }: Props) {
   const { setOpenMobile } = useSidebar();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [pendingHref, setPendingHref] = useState<string | null>(null);
+  // Copy of the design the open dialog refers to. The context value is cleared
+  // when the Design page unmounts (e.g. browser Back while the dialog is open).
+  const [pendingImage, setPendingImage] = useState<string | null>(null);
 
   function handleNavClick(e: React.MouseEvent, href: string) {
     if (outputImage && pathname !== href) {
       e.preventDefault();
       setPendingHref(href);
+      setPendingImage(outputImage);
       setDialogOpen(true);
     } else {
       setOpenMobile(false);
@@ -64,8 +68,9 @@ export function AppSidebar({ variant }: Props) {
   }
 
   function handleDownload() {
-    if (outputImage) {
-      saveAs(outputImage, "interior-design.png");
+    const image = pendingImage ?? outputImage;
+    if (image) {
+      saveAs(image, "interior-design.png");
     }
   }
 
@@ -77,6 +82,7 @@ export function AppSidebar({ variant }: Props) {
     setOpenMobile(false);
     setDialogOpen(false);
     setPendingHref(null);
+    setPendingImage(null);
   }
 
   return (
@@ -88,7 +94,7 @@ export function AppSidebar({ variant }: Props) {
               asChild
               className="data-[slot=sidebar-menu-button]!p-1.5!"
             >
-              <Link href="/">
+              <Link href="/" onClick={(e) => handleNavClick(e, "/")}>
                 <Palette className="size-5!" />
                 <span className="text-base font-semibold">
                   Interior Designer

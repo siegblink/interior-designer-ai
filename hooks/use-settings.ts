@@ -1,32 +1,24 @@
 import { useState, useEffect, useCallback } from "react";
-import type { RoomType, DesignTheme } from "@/types";
-import { SCALE_DEFAULT } from "@/components/design-controls";
+import {
+  DEFAULT_SETTINGS,
+  SETTINGS_STORAGE_KEY,
+  parseStoredSettings,
+  type Settings,
+} from "@/lib/settings";
 
-export interface Settings {
-  theme: DesignTheme;
-  room: RoomType;
-  scale: number;
-}
-
-const STORAGE_KEY = "interior-designer-settings";
-
-const DEFAULT_SETTINGS: Settings = {
-  theme: "Modern",
-  room: "Living Room",
-  scale: SCALE_DEFAULT,
-};
+export type { Settings };
 
 export function useSettings(): [Settings, (patch: Partial<Settings>) => void] {
   const [settings, setSettingsState] = useState<Settings>(DEFAULT_SETTINGS);
 
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
       if (stored) {
-        setSettingsState({ ...DEFAULT_SETTINGS, ...JSON.parse(stored) });
+        setSettingsState(parseStoredSettings(stored));
       }
     } catch {
-      // ignore malformed storage
+      // ignore unavailable storage
     }
   }, []);
 
@@ -34,7 +26,7 @@ export function useSettings(): [Settings, (patch: Partial<Settings>) => void] {
     setSettingsState((prev) => {
       const next = { ...prev, ...patch };
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(next));
       } catch {
         // ignore write errors (private mode, storage full)
       }

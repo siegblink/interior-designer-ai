@@ -8,9 +8,15 @@ import { Button } from "@/components/ui/button";
 interface UploadedImageProps {
   src: string;
   onRemove: () => void;
+  /** Disables removing the photo, e.g. while a design is being generated. */
+  disabled?: boolean;
 }
 
-export function UploadedImage({ src, onRemove }: UploadedImageProps) {
+export function UploadedImage({
+  src,
+  onRemove,
+  disabled = false,
+}: UploadedImageProps) {
   return (
     <Card className="overflow-hidden">
       <CardContent className="relative p-0">
@@ -28,6 +34,7 @@ export function UploadedImage({ src, onRemove }: UploadedImageProps) {
           size="icon"
           className="absolute top-2 right-2"
           onClick={onRemove}
+          disabled={disabled}
         >
           <X className="h-4 w-4" />
           <span className="sr-only">Remove image</span>

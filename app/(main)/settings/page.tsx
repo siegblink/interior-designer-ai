@@ -1,15 +1,7 @@
 "use client";
 
-import {
-  Home,
-  Scale,
-  Palette,
-  Sparkles,
-  Sun,
-  Moon,
-  Monitor,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Sun, Moon, Monitor } from "lucide-react";
+import { useSyncExternalStore } from "react";
 import { useTheme } from "next-themes";
 import {
   Card,
@@ -22,6 +14,7 @@ import { Combobox } from "@/components/ui/combobox";
 import { Separator } from "@/components/ui/separator";
 import { ROOM_TYPES, DESIGN_THEMES } from "@/lib/constants";
 import { useSettings } from "@/hooks/use-settings";
+import { STYLE_PRESETS } from "@/components/style-presets";
 import { cn } from "@/lib/utils";
 import type { RoomType, DesignTheme } from "@/types";
 
@@ -31,43 +24,20 @@ const THEME_OPTIONS = [
   { value: "system", label: "System", icon: Monitor },
 ] as const;
 
-interface StylePreset {
-  value: number;
-  label: string;
-  description: string;
-  icon: LucideIcon;
+function subscribeToNothing() {
+  return () => {};
 }
-
-const STYLE_PRESETS: StylePreset[] = [
-  {
-    value: 4,
-    label: "Faithful",
-    description: "Keeps your room's layout intact",
-    icon: Home,
-  },
-  {
-    value: 9,
-    label: "Balanced",
-    description: "A blend of your space and the style",
-    icon: Scale,
-  },
-  {
-    value: 14,
-    label: "Creative",
-    description: "More AI freedom with the design",
-    icon: Palette,
-  },
-  {
-    value: 19,
-    label: "Bold",
-    description: "Full AI reimagining of your space",
-    icon: Sparkles,
-  },
-];
 
 export default function SettingsPage() {
   const [settings, setSettings] = useSettings();
   const { theme, setTheme } = useTheme();
+  // The active theme is only known in the browser. Render no selection on the
+  // server and during hydration, then highlight it, to avoid a mismatch.
+  const isHydrated = useSyncExternalStore(
+    subscribeToNothing,
+    () => true,
+    () => false
+  );
 
   return (
     <div className="space-y-6">
@@ -167,7 +137,7 @@ export default function SettingsPage() {
           <div className="grid grid-cols-3 gap-3 sm:w-72">
             {THEME_OPTIONS.map((option) => {
               const Icon = option.icon;
-              const isSelected = theme === option.value;
+              const isSelected = isHydrated && theme === option.value;
               return (
                 <button
                   key={option.value}

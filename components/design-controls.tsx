@@ -1,48 +1,12 @@
 "use client";
 
-import { Wand2, Home, Scale, Palette, Sparkles } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
+import { STYLE_PRESETS } from "@/components/style-presets";
 import { ROOM_TYPES, DESIGN_THEMES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { RoomType, DesignTheme } from "@/types";
-
-interface StylePreset {
-  value: number;
-  label: string;
-  description: string;
-  icon: LucideIcon;
-}
-
-const STYLE_PRESETS: StylePreset[] = [
-  {
-    value: 4,
-    label: "Faithful",
-    description: "Keeps your room's layout intact",
-    icon: Home,
-  },
-  {
-    value: 9,
-    label: "Balanced",
-    description: "A blend of your space and the style",
-    icon: Scale,
-  },
-  {
-    value: 14,
-    label: "Creative",
-    description: "More AI freedom with the design",
-    icon: Palette,
-  },
-  {
-    value: 19,
-    label: "Bold",
-    description: "Full AI reimagining of your space",
-    icon: Sparkles,
-  },
-];
-
-export const SCALE_DEFAULT = 9;
 
 interface DesignControlsProps {
   selectedTheme: DesignTheme;

@@ -19,19 +19,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import type { Design } from "@/lib/gallery";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
-interface Design {
-  url: string;
-  theme: string;
-  room: string;
-  createdAt: string;
-}
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, {
@@ -55,7 +49,11 @@ export function AdminGallery({ initialDesigns }: { initialDesigns: Design[] }) {
   function toggleSelect(url: string) {
     setSelected((prev) => {
       const next = new Set(prev);
-      next.has(url) ? next.delete(url) : next.add(url);
+      if (next.has(url)) {
+        next.delete(url);
+      } else {
+        next.add(url);
+      }
       return next;
     });
   }
@@ -65,12 +63,18 @@ export function AdminGallery({ initialDesigns }: { initialDesigns: Design[] }) {
   }
 
   async function deleteDesign(url: string): Promise<boolean> {
-    const res = await fetch("/api/gallery", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url }),
-    });
-    return res.ok;
+    try {
+      const res = await fetch("/api/gallery", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      return res.ok;
+    } catch {
+      // A network failure counts as a failed delete instead of leaving the
+      // gallery stuck in its "deleting" state.
+      return false;
+    }
   }
 
   async function handleDelete(url: string) {
@@ -195,7 +199,7 @@ export function AdminGallery({ initialDesigns }: { initialDesigns: Design[] }) {
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
                         className="object-cover"
-                        priority={i < 3}
+                        preload={i < 3}
                       />
                     </div>
                     <div className="absolute top-2 left-2 z-10">
