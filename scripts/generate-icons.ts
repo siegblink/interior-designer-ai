@@ -2,30 +2,27 @@ import sharp from "sharp";
 import { writeFileSync } from "fs";
 import { join } from "path";
 
-// House icon on dark purple gradient — reflects the "Interior Designer" home metaphor
-// and matches the home icon used in the app's sidebar navigation.
+// The app's logo: the palette from the sidebar header (Lucide's "palette"
+// outline) with four paint dots, on the dark zinc background. The artwork is
+// drawn on Lucide's 24px grid.
 function iconSvg(cornerRadius: number): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1e1040"/>
-      <stop offset="100%" stop-color="#6d28d9"/>
-    </linearGradient>
-  </defs>
-  <rect width="32" height="32" rx="${cornerRadius}" fill="url(#g)"/>
-  <polygon points="16,5 27,16 5,16" fill="white"/>
-  <rect x="6" y="15" width="20" height="13" fill="white"/>
-  <rect x="12" y="21" width="8" height="7" rx="1" fill="#3b0764"/>
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <rect width="24" height="24" rx="${cornerRadius}" fill="#18181b"/>
+  <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" fill="none" stroke="#ffffff" stroke-width="1.125" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="13.5" cy="6.5" r="0.95" fill="#f97316"/>
+  <circle cx="17.5" cy="10.5" r="0.95" fill="#60a5fa"/>
+  <circle cx="6.5" cy="12.5" r="0.95" fill="#f59e0b"/>
+  <circle cx="8.5" cy="7.5" r="0.95" fill="#a3e635"/>
 </svg>`;
 }
 
-const ROUNDED = iconSvg(6);
+const ROUNDED = iconSvg(5.25);
 // iOS masks home-screen icons itself and shows transparent corners as black.
 const SQUARE = iconSvg(0);
 
 async function toPng(svg: string, size: number): Promise<Buffer> {
-  // Render the 32px artwork at the target size instead of upscaling a bitmap.
-  return sharp(Buffer.from(svg), { density: (72 * size) / 32 })
+  // Render the 24px artwork at the target size instead of upscaling a bitmap.
+  return sharp(Buffer.from(svg), { density: (72 * size) / 24 })
     .resize(size, size)
     .png()
     .toBuffer();
@@ -79,7 +76,7 @@ function write(path: string[], data: Buffer): void {
 
 // app/favicon.ico and app/apple-icon.png are Next.js file conventions: Next
 // adds the <link> tags for them. The manifest icons are referenced from
-// public/manifest.json.
+// app/manifest.ts.
 const icoSizes = [16, 32, 48];
 const icoPngs = await Promise.all(
   icoSizes.map(async (size) => ({ size, data: await toPng(ROUNDED, size) }))
