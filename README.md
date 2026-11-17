@@ -52,7 +52,7 @@ For more installation options, visit [https://bun.sh/docs/installation](https://
 bun install -g portless
 ```
 
-portless is a Node.js command-line tool, so Node.js must also be installed (the repository's `.nvmrc` selects the current LTS release).
+Next.js and portless both run on Node.js, so Node.js must also be installed (the repository's `.nvmrc` selects the current LTS release).
 
 > On first run, portless will request your password to bind port 443 and install a local CA certificate so browsers trust the HTTPS connection.
 
@@ -145,7 +145,7 @@ When self-hosting behind a reverse proxy, set `TRUSTED_IP_HEADER` to the header 
 - **Vercel Blob** - Storage for the design gallery
 - **react-compare-slider** - Before/after comparison slider
 - **zod** and **React Hook Form** - Request and form validation
-- **Bun** - Package manager, test runner (`bun test`) and local runtime
+- **Bun** - Package manager, script runner and test runner (`bun test`); Next.js itself runs on Node.js
 - **oxlint** and **oxfmt** - Linting and formatting, run on every commit by a Husky pre-commit hook
 
 ## Contributing
