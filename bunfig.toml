@@ -3,3 +3,9 @@
 # malicious releases that are caught and removed shortly after publishing.
 # Versions already in bun.lock are not affected.
 minimumReleaseAge = 604800
+
+[test]
+# Only tests/ holds tests, and tests/setup.ts (mocks, dummy credentials) must
+# load before every test file.
+root = "./tests"
+preload = ["./tests/setup.ts"]

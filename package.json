@@ -10,6 +10,8 @@
     "lint:fix": "oxlint --fix",
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check .",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tests",
     "icons": "bun scripts/generate-icons.ts",
     "prepare": "bun --bun husky"
   },
@@ -45,6 +47,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.5",
+    "@types/bun": "^1.4.4",
     "@types/file-saver": "^2.0.7",
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
