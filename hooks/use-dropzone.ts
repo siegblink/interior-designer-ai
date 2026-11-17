@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import { MAX_FILE_SIZE, ACCEPTED_FILE_TYPES } from "@/lib/constants";
+import { ACCEPTED_FILE_TYPES } from "@/lib/constants";
+import { validateUploadFile } from "@/lib/upload";
 
 interface UseDropzoneOptions {
   onDrop: (file: File) => void;
@@ -35,15 +36,9 @@ export function useDropzone({
 
   const validateFile = useCallback(
     (file: File): boolean => {
-      if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
-        onError?.("Please upload a JPEG or PNG image");
-        return false;
-      }
-      if (file.size > MAX_FILE_SIZE) {
-        onError?.("File size must be less than 5MB");
-        return false;
-      }
-      return true;
+      const error = validateUploadFile(file);
+      if (error) onError?.(error);
+      return error === null;
     },
     [onError]
   );
@@ -65,6 +60,8 @@ export function useDropzone({
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
+      // Reset so picking the same file again still fires a change event.
+      e.target.value = "";
       if (file && validateFile(file)) {
         onDrop(file);
       }
@@ -82,6 +79,8 @@ export function useDropzone({
       onDragLeave: (e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
+        // Ignore leave events fired when the pointer moves onto a child.
+        if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
         setIsDragActive(false);
       },
       onDragOver: (e: React.DragEvent) => {
