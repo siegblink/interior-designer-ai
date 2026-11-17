@@ -20,9 +20,22 @@ import {
 beforeEach(resetMocks);
 afterEach(() => setSystemTime());
 
+/** Stretches a secret or password the way lib/admin-session.ts does. */
+function stretch(value: string): Buffer {
+  return scryptSync(value, "interior-designer:admin-session:v1", 32);
+}
+
+/** Hex of an argument timingSafeEqual received. */
+function toHex(bytes: ArrayBufferLike | NodeJS.ArrayBufferView): string {
+  const view = ArrayBuffer.isView(bytes)
+    ? new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength)
+    : new Uint8Array(bytes);
+  return Buffer.from(view).toString("hex");
+}
+
 /** Signs an expiry the way lib/admin-session.ts does. */
 function sign(expiresAt: number, secret = ADMIN_SECRET): string {
-  const key = scryptSync(secret, "interior-designer:admin-session:v1", 32);
+  const key = stretch(secret);
   return createHmac("sha256", key)
     .update(`admin-session:${expiresAt}`)
     .digest("hex");
@@ -35,28 +48,36 @@ function newSession(): string {
 }
 
 describe("isAdminPassword", () => {
-  test("accepts only the exact configured secret", () => {
-    expect(isAdminPassword(ADMIN_SECRET)).toBe(true);
-    expect(isAdminPassword(`${ADMIN_SECRET} `)).toBe(false);
-    expect(isAdminPassword(ADMIN_SECRET.slice(0, -1))).toBe(false);
-    expect(isAdminPassword(ADMIN_SECRET.toUpperCase())).toBe(false);
+  test("accepts only the exact configured secret", async () => {
+    expect(await isAdminPassword(ADMIN_SECRET)).toBe(true);
+    expect(await isAdminPassword(`${ADMIN_SECRET} `)).toBe(false);
+    expect(await isAdminPassword(ADMIN_SECRET.slice(0, -1))).toBe(false);
+    expect(await isAdminPassword(ADMIN_SECRET.toUpperCase())).toBe(false);
   });
 
-  test("rejects empty and non-string values", () => {
+  test("rejects empty and non-string values", async () => {
     for (const value of ["", undefined, null, 0, true, {}, [ADMIN_SECRET]]) {
-      expect(isAdminPassword(value)).toBe(false);
+      expect(await isAdminPassword(value)).toBe(false);
     }
   });
 
-  test("rejects everything when no secret is configured", () => {
+  test("rejects everything when no secret is configured", async () => {
     for (const secret of [undefined, ""]) {
       if (secret === undefined) delete process.env.GALLERY_ADMIN_SECRET;
       else process.env.GALLERY_ADMIN_SECRET = secret;
 
-      expect(isAdminPassword("")).toBe(false);
-      expect(isAdminPassword("undefined")).toBe(false);
-      expect(isAdminPassword(ADMIN_SECRET)).toBe(false);
+      expect(await isAdminPassword("")).toBe(false);
+      expect(await isAdminPassword("undefined")).toBe(false);
+      expect(await isAdminPassword(ADMIN_SECRET)).toBe(false);
     }
+  });
+
+  test("accepts the new secret after GALLERY_ADMIN_SECRET changes", async () => {
+    expect(await isAdminPassword(ADMIN_SECRET)).toBe(true);
+
+    process.env.GALLERY_ADMIN_SECRET = "a-different-secret";
+    expect(await isAdminPassword("a-different-secret")).toBe(true);
+    expect(await isAdminPassword(ADMIN_SECRET)).toBe(false);
   });
 });
 
@@ -205,17 +226,19 @@ describe("token strictness", () => {
 });
 
 describe("constant-time comparisons", () => {
-  test("isAdminPassword compares fixed-length digests with timingSafeEqual", () => {
+  test("isAdminPassword compares scrypt-derived keys with timingSafeEqual", async () => {
     const spy = spyOn(nodeCrypto, "timingSafeEqual");
     try {
-      expect(isAdminPassword("wrong")).toBe(false);
-      expect(isAdminPassword(ADMIN_SECRET)).toBe(true);
+      expect(await isAdminPassword("wrong")).toBe(false);
+      expect(await isAdminPassword(ADMIN_SECRET)).toBe(true);
 
-      expect(spy).toHaveBeenCalledTimes(2);
-      for (const [submitted, expected] of spy.mock.calls) {
-        expect(submitted.byteLength).toBe(32);
-        expect(expected.byteLength).toBe(32);
-      }
+      // The password is stretched with scrypt, never run through a fast hash
+      // such as SHA-256 (CodeQL js/insufficient-password-hash).
+      const secretKey = stretch(ADMIN_SECRET);
+      expect(spy.mock.calls.map((call) => call.map(toHex))).toEqual([
+        [toHex(stretch("wrong")), toHex(secretKey)],
+        [toHex(secretKey), toHex(secretKey)],
+      ]);
     } finally {
       spy.mockRestore();
     }

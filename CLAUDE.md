@@ -184,7 +184,7 @@ All routes are Route Handlers and return errors as `{ error: string }`.
 
 **Admin session** (`lib/admin-session.ts`)
 
-- `isAdminPassword()` compares SHA-256 digests of the submitted password and `GALLERY_ADMIN_SECRET` with `timingSafeEqual`.
+- `isAdminPassword()` is async. It stretches the submitted password with scrypt (the asynchronous call, so a sign-in attempt does not block the event loop) and compares the derived key with the one derived from `GALLERY_ADMIN_SECRET` using `timingSafeEqual`. Do not run the password through a fast hash such as SHA-256: CodeQL reports that as `js/insufficient-password-hash`.
 - `createAdminSession()` returns `<expiresAt>.<hmac>`: `expiresAt` in epoch milliseconds, `hmac` the hex HMAC-SHA256 of `admin-session:<expiresAt>`. The HMAC key is derived from `GALLERY_ADMIN_SECRET` with scrypt (cached per process), so the cookie neither holds the password nor allows fast offline guessing of it.
 - Cookie `admin_session`: `httpOnly`, `sameSite: "strict"`, `secure` in production, `path: "/"`, `maxAge` 7 days (`ADMIN_SESSION_MAX_AGE`).
 - `isAdminSession()` checks the format, the expiry and the signature (constant time). It is used by `DELETE /api/gallery` and `app/admin/page.tsx`.

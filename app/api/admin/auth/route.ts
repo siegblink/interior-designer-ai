@@ -16,7 +16,9 @@ export async function POST(request: Request) {
   if (refused) return refused;
 
   const body = await request.json().catch(() => null);
-  const session = isAdminPassword(body?.password) ? createAdminSession() : null;
+  const session = (await isAdminPassword(body?.password))
+    ? createAdminSession()
+    : null;
 
   if (!session) {
     return NextResponse.json({ error: "Invalid password" }, { status: 401 });

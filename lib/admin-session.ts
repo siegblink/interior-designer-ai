@@ -1,12 +1,10 @@
-import {
-  createHash,
-  createHmac,
-  scryptSync,
-  timingSafeEqual,
-} from "node:crypto";
+import { createHmac, scrypt, scryptSync, timingSafeEqual } from "node:crypto";
 
 export const ADMIN_SESSION_COOKIE = "admin_session";
 export const ADMIN_SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days, in seconds
+
+const KEY_SALT = "interior-designer:admin-session:v1";
+const KEY_LENGTH = 32;
 
 let cachedKey: { secret: string; key: Buffer } | null = null;
 
@@ -19,7 +17,7 @@ function sessionKey(secret: string): Buffer {
   if (cachedKey?.secret !== secret) {
     cachedKey = {
       secret,
-      key: scryptSync(secret, "interior-designer:admin-session:v1", 32),
+      key: scryptSync(secret, KEY_SALT, KEY_LENGTH),
     };
   }
   return cachedKey.key;
@@ -31,15 +29,33 @@ function signExpiry(expiresAt: number, secret: string): Buffer {
     .digest();
 }
 
-/** Constant-time check of a submitted password against GALLERY_ADMIN_SECRET. */
-export function isAdminPassword(password: unknown): boolean {
+/**
+ * The stretch sessionKey() applies, for a submitted password. It runs on
+ * every sign-in attempt, so it uses the asynchronous scrypt, which does not
+ * block the event loop.
+ */
+function stretchPassword(password: string): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    scrypt(password, KEY_SALT, KEY_LENGTH, (error, key) => {
+      if (error) reject(error);
+      else resolve(key);
+    });
+  });
+}
+
+/**
+ * Constant-time check of a submitted password against GALLERY_ADMIN_SECRET.
+ * Both are stretched with scrypt and the derived keys are compared: they have
+ * a fixed length, as timingSafeEqual needs, and the password never goes
+ * through a fast hash.
+ */
+export async function isAdminPassword(password: unknown): Promise<boolean> {
   const secret = process.env.GALLERY_ADMIN_SECRET;
   if (!secret || typeof password !== "string" || password.length === 0) {
     return false;
   }
-  const submitted = createHash("sha256").update(password).digest();
-  const expected = createHash("sha256").update(secret).digest();
-  return timingSafeEqual(submitted, expected);
+  const submitted = await stretchPassword(password);
+  return timingSafeEqual(submitted, sessionKey(secret));
 }
 
 /**
