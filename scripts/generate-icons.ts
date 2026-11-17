@@ -4,21 +4,31 @@ import { join } from "path";
 
 // House icon on dark purple gradient — reflects the "Interior Designer" home metaphor
 // and matches the home icon used in the app's sidebar navigation.
-const SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+function iconSvg(cornerRadius: number): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#1e1040"/>
       <stop offset="100%" stop-color="#6d28d9"/>
     </linearGradient>
   </defs>
-  <rect width="32" height="32" rx="6" fill="url(#g)"/>
+  <rect width="32" height="32" rx="${cornerRadius}" fill="url(#g)"/>
   <polygon points="16,5 27,16 5,16" fill="white"/>
   <rect x="6" y="15" width="20" height="13" fill="white"/>
   <rect x="12" y="21" width="8" height="7" rx="1" fill="#3b0764"/>
 </svg>`;
+}
 
-async function toPng(size: number): Promise<Buffer> {
-  return sharp(Buffer.from(SVG)).resize(size, size).png().toBuffer();
+const ROUNDED = iconSvg(6);
+// iOS masks home-screen icons itself and shows transparent corners as black.
+const SQUARE = iconSvg(0);
+
+async function toPng(svg: string, size: number): Promise<Buffer> {
+  // Render the 32px artwork at the target size instead of upscaling a bitmap.
+  return sharp(Buffer.from(svg), { density: (72 * size) / 32 })
+    .resize(size, size)
+    .png()
+    .toBuffer();
 }
 
 function makeIco(pngs: { size: number; data: Buffer }[]): Buffer {
@@ -61,14 +71,21 @@ function makeIco(pngs: { size: number; data: Buffer }[]): Buffer {
   return out;
 }
 
-const sizes = [16, 32, 48];
-const pngs = await Promise.all(
-  sizes.map(async (size) => ({ size, data: await toPng(size) }))
+function write(path: string[], data: Buffer): void {
+  const dest = join(process.cwd(), ...path);
+  writeFileSync(dest, data);
+  console.log(`✓  ${path.join("/")} (${data.length} bytes)`);
+}
+
+// app/favicon.ico and app/apple-icon.png are Next.js file conventions: Next
+// adds the <link> tags for them. The manifest icons are referenced from
+// public/manifest.json.
+const icoSizes = [16, 32, 48];
+const icoPngs = await Promise.all(
+  icoSizes.map(async (size) => ({ size, data: await toPng(ROUNDED, size) }))
 );
 
-const ico = makeIco(pngs);
-const dest = join(process.cwd(), "app", "favicon.ico");
-writeFileSync(dest, ico);
-console.log(
-  `✓  ${sizes.join("×, ")}× PNGs assembled → ${dest} (${ico.length} bytes)`
-);
+write(["app", "favicon.ico"], makeIco(icoPngs));
+write(["app", "apple-icon.png"], await toPng(SQUARE, 180));
+write(["public", "icon-192.png"], await toPng(ROUNDED, 192));
+write(["public", "icon-512.png"], await toPng(ROUNDED, 512));
