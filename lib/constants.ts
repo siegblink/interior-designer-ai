@@ -28,3 +28,8 @@ export const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/png"];
 // function request bodies over 4.5 MB, so the browser scales uploads down to
 // fit this budget (lib/upload-image.ts) and the API refuses anything longer.
 export const MAX_IMAGE_DATA_URL_LENGTH = 4_000_000;
+
+// The model's guidance scale ("style strength"): default and accepted bounds.
+export const SCALE_DEFAULT = 9;
+export const SCALE_MIN = 0.1;
+export const SCALE_MAX = 30;

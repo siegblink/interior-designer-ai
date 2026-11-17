@@ -1,34 +1,16 @@
 import { cookies } from "next/headers";
-import { list } from "@vercel/blob";
 import { AdminSignIn } from "@/components/admin-sign-in";
 import { AdminGallery } from "@/components/admin-gallery";
+import { ADMIN_SESSION_COOKIE, isAdminSession } from "@/lib/admin-session";
+import { listDesigns, type Design } from "@/lib/gallery";
 
 export const dynamic = "force-dynamic";
 
-interface Design {
-  url: string;
-  theme: string;
-  room: string;
-  createdAt: string;
-}
-
-function decodePathname(pathname: string): { theme: string; room: string } {
-  const filename = pathname.split("/").pop() ?? "";
-  const withoutExt = filename.replace(/\.png$/, "");
-  const [, encodedTheme, ...rest] = withoutExt.split("_");
-  return {
-    theme: decodeURIComponent(encodedTheme ?? ""),
-    room: decodeURIComponent(rest.join("_")),
-  };
-}
-
 export default async function AdminPage() {
   const cookieStore = await cookies();
-  const session = cookieStore.get("admin_session");
-  const isAuthenticated =
-    !!session?.value &&
-    !!process.env.GALLERY_ADMIN_SECRET &&
-    session.value === process.env.GALLERY_ADMIN_SECRET;
+  const isAuthenticated = isAdminSession(
+    cookieStore.get(ADMIN_SESSION_COOKIE)?.value
+  );
 
   if (!isAuthenticated) {
     return <AdminSignIn />;
@@ -36,21 +18,7 @@ export default async function AdminPage() {
 
   let designs: Design[] = [];
   try {
-    const { blobs } = await list({ prefix: "designs/" });
-    designs = blobs
-      .map((blob) => {
-        const { theme, room } = decodePathname(blob.pathname);
-        return {
-          url: blob.url,
-          theme,
-          room,
-          createdAt: blob.uploadedAt.toISOString(),
-        };
-      })
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+    designs = await listDesigns();
   } catch {
     // blob store unavailable — show empty gallery
   }

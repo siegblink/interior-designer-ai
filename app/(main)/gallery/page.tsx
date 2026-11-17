@@ -1,42 +1,11 @@
-import { list } from "@vercel/blob";
 import { GalleryGrid } from "@/components/gallery-grid";
+import { listDesigns, type Design } from "@/lib/gallery";
 
 export const dynamic = "force-dynamic";
 
-interface Design {
-  url: string;
-  theme: string;
-  room: string;
-  createdAt: string;
-}
-
-function decodePathname(pathname: string): { theme: string; room: string } {
-  const filename = pathname.split("/").pop() ?? "";
-  const withoutExt = filename.replace(/\.png$/, "");
-  const [, encodedTheme, ...rest] = withoutExt.split("_");
-  return {
-    theme: decodeURIComponent(encodedTheme ?? ""),
-    room: decodeURIComponent(rest.join("_")),
-  };
-}
-
 async function fetchDesigns(): Promise<Design[]> {
   try {
-    const { blobs } = await list({ prefix: "designs/" });
-    return blobs
-      .map((blob) => {
-        const { theme, room } = decodePathname(blob.pathname);
-        return {
-          url: blob.url,
-          theme,
-          room,
-          createdAt: blob.uploadedAt.toISOString(),
-        };
-      })
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+    return await listDesigns();
   } catch {
     return [];
   }

@@ -1,18 +1,25 @@
 import { NextResponse } from "next/server";
+import {
+  ADMIN_SESSION_COOKIE,
+  ADMIN_SESSION_MAX_AGE,
+  createAdminSession,
+  isAdminPassword,
+} from "@/lib/admin-session";
 
 export async function POST(request: Request) {
-  const { password } = await request.json();
+  const body = await request.json().catch(() => null);
+  const session = isAdminPassword(body?.password) ? createAdminSession() : null;
 
-  if (!password || password !== process.env.GALLERY_ADMIN_SECRET) {
+  if (!session) {
     return NextResponse.json({ error: "Invalid password" }, { status: 401 });
   }
 
   const response = NextResponse.json({ ok: true });
-  response.cookies.set("admin_session", process.env.GALLERY_ADMIN_SECRET!, {
+  response.cookies.set(ADMIN_SESSION_COOKIE, session, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: ADMIN_SESSION_MAX_AGE,
     path: "/",
   });
   return response;
@@ -20,6 +27,6 @@ export async function POST(request: Request) {
 
 export async function DELETE() {
   const response = NextResponse.json({ ok: true });
-  response.cookies.delete("admin_session");
+  response.cookies.delete(ADMIN_SESSION_COOKIE);
   return response;
 }
