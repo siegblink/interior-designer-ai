@@ -1,0 +1,5 @@
+[install]
+# Only resolve package versions published at least 7 days ago. Guards against
+# malicious releases that are caught and removed shortly after publishing.
+# Versions already in bun.lock are not affected.
+minimumReleaseAge = 604800

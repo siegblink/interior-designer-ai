@@ -32,7 +32,8 @@ bun-debug.log*
 bun-error.log*
 
 # local env files
-.env*.local
+.env*
+!.env.example
 
 # vercel
 .vercel
@@ -40,6 +41,3 @@ bun-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# bun
-.bun
