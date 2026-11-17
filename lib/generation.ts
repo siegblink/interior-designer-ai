@@ -21,5 +21,12 @@ export function generationErrorMessage(status: number, data: unknown): string {
     return "Image is too large to upload. Try a smaller photo.";
   }
   if (status === 504) return "Generation timed out. Please try again.";
+  // The Vercel Firewall answers these itself when one of its rules matches.
+  if (status === 429) {
+    return "Too many requests. Please wait a few minutes and try again.";
+  }
+  if (status === 403) {
+    return "This request was blocked. Reload the page and try again.";
+  }
   return "Failed to generate design";
 }

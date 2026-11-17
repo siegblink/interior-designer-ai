@@ -38,7 +38,14 @@ export function AdminSignIn() {
     });
 
     if (!response.ok) {
-      form.setError("password", { message: "Invalid password. Try again." });
+      const data = await response.json().catch(() => null);
+      form.setError("password", {
+        message:
+          (response.status === 429 || response.status === 403) &&
+          typeof data?.error === "string"
+            ? data.error
+            : "Invalid password. Try again.",
+      });
       return;
     }
 

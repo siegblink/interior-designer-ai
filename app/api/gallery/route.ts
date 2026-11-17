@@ -5,6 +5,14 @@ import { z } from "zod";
 import { ADMIN_SESSION_COOKIE, isAdminSession } from "@/lib/admin-session";
 import { DESIGN_THEMES, ROOM_TYPES } from "@/lib/constants";
 import { DESIGNS_PREFIX, encodeDesignPathname } from "@/lib/gallery";
+import {
+  GALLERY_SAVE_PER_CLIENT,
+  gallerySaveBudget,
+  limitClient,
+  limitGlobal,
+  turnedOff,
+} from "@/lib/rate-limit";
+import { rejectCrossSite } from "@/lib/same-origin";
 
 const ALLOWED_IMAGE_HOSTS = ["replicate.delivery"];
 const BLOB_HOST_SUFFIX = ".public.blob.vercel-storage.com";
@@ -136,6 +144,12 @@ function parseDesignBlobUrl(rawUrl: unknown): URL | null {
 }
 
 export async function POST(request: Request) {
+  const refused =
+    rejectCrossSite(request) ??
+    turnedOff(gallerySaveBudget()) ??
+    limitClient(GALLERY_SAVE_PER_CLIENT, request);
+  if (refused) return refused;
+
   const parsed = saveSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
@@ -171,6 +185,10 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    // Each upload is a Blob Advanced Operation; see gallerySaveBudget().
+    const overBudget = limitGlobal(gallerySaveBudget());
+    if (overBudget) return overBudget;
 
     const blob = await put(encodeDesignPathname(theme, room), imageBuffer, {
       access: "public",

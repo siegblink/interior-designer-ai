@@ -10,6 +10,15 @@ import {
   SCALE_MIN,
 } from "@/lib/constants";
 import { buildPrompt, QUALITY_PROMPT, NEGATIVE_PROMPT } from "@/lib/prompts";
+import {
+  GENERATE_PER_CLIENT,
+  generationBudget,
+  limitClient,
+  limitGlobal,
+  refundGlobal,
+  turnedOff,
+} from "@/lib/rate-limit";
+import { rejectCrossSite } from "@/lib/same-origin";
 
 const requestSchema = z.object({
   image: z
@@ -22,6 +31,13 @@ const requestSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  // Checked before the body is read, so a refused client costs no parsing.
+  const refused =
+    rejectCrossSite(request) ??
+    turnedOff(generationBudget()) ??
+    limitClient(GENERATE_PER_CLIENT, request);
+  if (refused) return refused;
+
   const parsed = requestSchema.safeParse(
     await request.json().catch(() => null)
   );
@@ -34,6 +50,10 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
+
+  // Only valid requests reach Replicate, so only they spend the daily budget.
+  const overBudget = limitGlobal(generationBudget());
+  if (overBudget) return overBudget;
 
   try {
     const { image, theme, room } = parsed.data;
@@ -87,6 +107,9 @@ export async function POST(request: Request) {
     // and response text.
     const status = (err as { response?: { status?: number } } | null)?.response
       ?.status;
+
+    // Replicate refused before starting a prediction, so nothing was billed.
+    if (status === 401 || status === 402) refundGlobal(generationBudget());
 
     if (status === 401) {
       return NextResponse.json(

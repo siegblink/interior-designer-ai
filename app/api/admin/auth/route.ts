@@ -5,8 +5,16 @@ import {
   createAdminSession,
   isAdminPassword,
 } from "@/lib/admin-session";
+import { ADMIN_SIGN_IN_PER_CLIENT, limitClient } from "@/lib/rate-limit";
+import { rejectCrossSite } from "@/lib/same-origin";
 
 export async function POST(request: Request) {
+  // Cross-site requests are refused first, so another site cannot use up
+  // the admin's sign-in attempts from the admin's own browser.
+  const refused =
+    rejectCrossSite(request) ?? limitClient(ADMIN_SIGN_IN_PER_CLIENT, request);
+  if (refused) return refused;
+
   const body = await request.json().catch(() => null);
   const session = isAdminPassword(body?.password) ? createAdminSession() : null;
 
